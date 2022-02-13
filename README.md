@@ -1,12 +1,12 @@
-
+# Learning Notes
 
 [TOC]
 
 ---
 
-# git
+## git
 
-## 配置git
+### 配置git
 
 1. 设置`user.name`和`user.emal`
 
@@ -36,8 +36,7 @@
 
       ---
 
-
-## git 常用命令
+### git 常用命令
 
 - `git status`
 - `git clone`
@@ -46,12 +45,12 @@
 - `git commit -m 'commits'` or `git commit -m 'commits' xxx.fileType`
 - `git add .` or `git xxx.fileType`
 - `git reflog`
-- 
 
-# 服务器相关
+---
 
-## scp 文件上传、下载
+## 服务器相关
+
+### scp 文件上传、下载
 
 - 上传 `scp .\cifar-10-python.tar.gz lutianen@10.170.46.236:/home/lutianen/`
 - 下载  `scp root@100.100.100.100:/var/tmp/a.txt /var`
-
