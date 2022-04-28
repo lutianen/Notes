@@ -48,6 +48,21 @@
 
 ---
 
+### Git实现从本地添加项目到远程仓库
+
+> Steps:
+>
+> 1. 创建一个新的远程仓库 - `Create a new repo` `Create repository`
+> 2. 创建并初始化本地仓库 - `git init`
+>    - 可添加待上传到远程仓库的项目文件
+> 3. 远程仓库和本地仓库关联 - `git remote add origin git@github.com:lutianen/System4CE7`
+> 4. 项目文件添加、提交、推送
+>    - `git add file`
+>    - `git commit -m 'commit statements' file`
+>    - `git push -u origin master` 
+>      - *由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，
+>      - *在以后的推送或者拉取时就可以简化命令*
+
 ## 服务器相关
 
 ### scp 文件上传、下载
