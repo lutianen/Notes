@@ -108,10 +108,11 @@ Endpoint = xxx.xxx.xxx.xxx
 ## 换源
 
 ```sh
+# 更新镜像排名
 sudo pacman-mirrors -i -c China -m rank
 pacman -S archlinuxcn-keyring
 
-# /etc/pacman.conf 添加
+# /etc/pacman.conf 添加 archlinuxcn 源
 # [archlinuxcn]
 # SigLevel = Optional TrustedOnly
 # Server = https://mirrors.bfsu.edu.cn/archlinuxcn/$arch
@@ -172,8 +173,32 @@ yay -U xxx  #xxx为本地包的地址，从离线包安装
 ```
 
 ```bash
+# neofetch、Chrome、百度云、坚果云、迅雷、WeChat、QQ、Telegram、LibroOffice、PDF、Qv2ray、gitkraken、LX-Music、VSCode、clash for windows、whitesur-kde-theme-git、serialtool、Typora、Redis、netstat/ifconfig、
+yay -Sy neofetch google-chrome baidunetdisk nutstore-experimental xunlei-bin electronic-wechat-uos-bin linuxqq telegram-desktop libreoffice foxitreader qv2ray gitkraken lx-music visual-studio-code-bin clash-for-windows-bin whitesur-kde-theme-git serialtool typora-free-cn redis net-tools
+```
+
+**输入法**
+
+```bash
 sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color
-yay -Sy clash clash-for-windows-bin latte-dock visual-studio-code-bin lx-music linuxqq google-chrome baidunetdisk
+
+cat ~/.xprofile 
+export QT_IM_MODULE=fcitx5
+```
+
+**fish**
+
+```bash
+yay -S fish
+curl -L https://get.oh-my.fish | fish 
+```
+
+**toDesk**
+
+```bash
+yay -S todesk-bin
+# 设置 todeskd 服务后才能正常运行
+sudo systemctl start todeskd
 ```
 
 **OBS**
@@ -185,6 +210,37 @@ sudo pacman -S obs-studio
 - OBS 硬件编码注意点：需要选择最新版的显卡驱动，否则硬件编码会失败（只能用软编码）
 
     ![显卡选择最新版](https://raw.githubusercontent.com/lutianen/PicBed/main/202307131642756.png)
+
+**TRIM**：TRIM会帮助清理SSD中的块，从而延长SSD的使用寿命
+
+```bash
+sudo systemctl enable fstrim.timer
+sudo systemctl start fstrim.timer
+```
+
+**SWAP 设置**
+
+https://wiki.archlinux.org/title/Swap#Swappiness
+
+- 查看 swap 使用率，一般是 60 ，意思是 60% 的概率将内存整理到 swap
+
+    ```bash
+    cat /proc/sys/vm/swappiness
+    ```
+
+- 修改 swap 使用策略为 10%，即 10% 的概率将内存整理到 swap
+
+    ```bash
+    sudo sysctl -w vm.swappiness=10
+    ```
+
+- 修改配置文件：`sudo vim /etc/sysctl.d/99-swappiness.conf` 在文件末尾加上下面这行内容：` vm.swappiness=10`
+
+- 重启后可查看 swappiness 的值
+
+![image-20230723115427188](https://raw.githubusercontent.com/lutianen/PicBed/main/202307231154321.png)
+
+**Systemd journal size limit**，控制日志最大可使用多少磁盘空间，修改`/etc/systemd/journald.conf` 中的`SystemMaxUse`参数 `SystemMaxUse=50M`
 
 ## python 脚本编写
 
