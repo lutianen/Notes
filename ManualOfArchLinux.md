@@ -173,8 +173,8 @@ yay -U xxx  #xxx为本地包的地址，从离线包安装
 ```
 
 ```bash
-# neofetch、Chrome、百度云、坚果云、迅雷、WeChat、QQ、Telegram、LibroOffice、PDF、Qv2ray、gitkraken、LX-Music、VSCode、clash for windows、whitesur-kde-theme-git、serialtool、Typora、Redis、netstat/ifconfig、
-yay -Sy neofetch google-chrome baidunetdisk nutstore-experimental xunlei-bin electronic-wechat-uos-bin linuxqq telegram-desktop libreoffice foxitreader qv2ray gitkraken lx-music visual-studio-code-bin clash-for-windows-bin whitesur-kde-theme-git serialtool typora-free-cn redis net-tools
+# neofetch、Chrome、百度云、坚果云、迅雷、WeChat、QQ、Telegram、LibroOffice、PDF、Qv2ray、gitkraken、LX-Music、VSCode、clash for windows、whitesur-kde-theme-git、serialtool、Typora、Redis、netstat/ifconfig、Screenshot
+yay -Sy neofetch google-chrome baidunetdisk nutstore-experimental xunlei-bin electronic-wechat-uos-bin linuxqq telegram-desktop libreoffice foxitreader qv2ray gitkraken lx-music visual-studio-code-bin clash-for-windows-bin whitesur-kde-theme-git serialtool typora-free-cn redis net-tools deepin-screenshot
 ```
 
 **输入法**
