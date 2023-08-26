@@ -62,6 +62,69 @@
 - `reinterpret_cast`：指针类型和整型或其他指针之间进行**不安全的转换**
 - `dynamic_cast`：**运行时转换**，用于**多态**，如 `Base*` 转 `Derived*，不推荐使用
 
+## 流 stream
+
+**只在记录日志时使用流，不要在业务代码中使用流**
+
+使用 `printf` 和 `scanf` 代替 `cout` 和 `cin`
+
+## 整形
+
+C++ 内建整型中，仅使用 `int`；在程序中如果需要不同大小的变量，可以使用`<cstdint>` 中长度精确的整形，如`int16_t`、`uint32_t`等，代替 `short`、`long` 等
+
+使用断言来指出变量为非负数, 而不是使用无符号型
+
+## 64 位下的可移植性
+
+```cpp
+// printf macros for size_t, in the style of inttypes.h
+#ifdef _LP64
+#define __PRIS_PREFIX "z"
+#else
+#define __PRIS_PREFIX
+#endif
+
+// Use these macros after a % in a printf format string
+// to get correct 32/64 bit behavior, like this:
+// size_t size = records.size();
+// printf("%"PRIuS"\n", size);
+#define PRIdS __PRIS_PREFIX "d"
+#define PRIxS __PRIS_PREFIX "x"
+#define PRIuS __PRIS_PREFIX "u"
+#define PRIXS __PRIS_PREFIX "X"
+#define PRIoS __PRIS_PREFIX "o"
+```
+
+| 类型 | 使用 | 不要使用 | 备注 |
+| --- | --- | --- | --- |
+| `void*` / `指针类型` | `%p` | `%lx` |
+| `int64_t` | `%"PRId64"` | `%qd` / `%lld` |
+| `uint64_t` | `%"PRIu64"` / `PRIx64` | |
+| `size_t` | `%"PRIuS"` / `%"PRIxs"` | C99 规定 `%zu` |
+| `ptrdiff_t` | `%"PRIdS"` | `%d` | C99 规定 `%zd`
+
+注意 `PRI*` 宏会被编译器扩展为独立字符串. 因此如果使用非常量的格式化字符串, 需要将宏的值而不是宏名插入格式中.
+
+使用 `PRI*` 宏同样可以在 % 后包含长度指示符.
+
+`printf("x = %30"PRIuS"\n", x)` 在 32 位 Linux 上将被展开为 `printf("x = %30" "u" "\n", x)`, 编译器当成 `printf("x = %30u\n", x)` 处理
+
+在 64 位系统中, 任何含有 `int64_t` / `uint64_t` 成员的类/结构体, 缺省都以 8 字节在结尾对齐. 如果 32 位和 64 位代码要共用持久化的结构体, 需要确保两种体系结构下的结构体对齐一致. 大多数编译器都允许调整结构体对齐. gcc 中可使用 `__attribute__((packed))`.
+
+## 预处理宏
+
+使用宏时要非常谨慎, 尽量以内联函数, 枚举和常量代替之.
+
+宏意味着你和编译器看到的代码是不同的. 这可能会导致异常行为, 尤其因为宏具有全局作用域.
+
+宏可以做一些其他技术无法实现的事情, 在一些代码库 (尤其是底层库中) 可以看到宏的某些特性 (如用 `#` 字符串化, 用 `##` 连接等等).
+
+- 不要在 `.h` 文件中定义宏.
+- 在马上要使用时才进行 `#define`, 使用后要立即 `#undef`.
+- 不要只是对已经存在的宏使用`#undef`，选择一个不会冲突的名称；
+- 不要试图使用展开后会导致 C++ 构造不稳定的宏, 不然也至少要附上文档说明其行为.
+- 不要用 `##` 处理函数，类和变量的名字。
+
 ## 注释
 
 **应该始终遵循自注释代码，简洁易懂，不要写无意义的注释**
