@@ -41,7 +41,7 @@
     mount /dev/nvme1n1p7 /mnt #挂载根目录
 
     mkdir -p /mnt/boot/efi #EFI分区的挂载点
-    mount /dev/nvme1n1p3 /mnt/boot/efi #挂载EFI分区
+    mount /dev/nvme1n1p1 /mnt/boot/efi #挂载EFI分区
 
     mount --mkdir /dev/nvme1n1p8 /mnt/home
     ```
@@ -65,6 +65,10 @@
     Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux/$repo/os/$arch
     Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
     Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+
+    pacman -Sy archlinuxcn-keyring
+    pacman -Syyu 
+
     ```
 
 6. 安装基础包
@@ -104,9 +108,10 @@
     ---
     locale-gen
     
-    # 网络管理器
-    pacman -S networkmanager
+    # 网络管理器，蓝牙
+    pacman -S networkmanager bluez bluez-utils pulseaudio-bluetooth alsa-utils pulseaudio pulseaudio-alsa 
     systemctl enable NetworkManager.service
+    systemctl enable bluetooth.service
 
     # root password
     passwd
@@ -128,7 +133,7 @@
     ---
     grub-mkconfig -o /boot/grub/grub.cfg
 
-    sudo pacman -S plasma sddm     
+    sudo pacman -S plasma xorg nvidia dolphin konsole fish noto-fonts-cjk noto-fonts-emoji
     sudo systemctl enable sddm
     
     # reboot
