@@ -97,7 +97,7 @@ Endpoint = xxx.xxx.xxx.xxx
 
 ![image-20230722173251745](https://raw.githubusercontent.com/lutianen/PicBed/main/202307221732768.png)
 
-2. 配置文件生成：https://replit.com/@misaka-blog/wgcf-profile-generator?v=1
+2. 配置文件生成：<https://replit.com/@misaka-blog/wgcf-profile-generator?v=1>
 
 ![image-20230722173030527](https://raw.githubusercontent.com/lutianen/PicBed/main/202307221730585.png)
 
@@ -173,8 +173,12 @@ yay -U xxx  #xxx为本地包的地址，从离线包安装
 ```
 
 ```bash
+yay -S clash-for-windows-bin 
+
 # neofetch、Chrome、百度云、坚果云、迅雷、WeChat、QQ、Telegram、LibroOffice、PDF、Qv2ray、gitkraken、LX-Music、VSCode、clash for windows、whitesur-kde-theme-git、serialtool、Typora、Redis、netstat/ifconfig、Screenshot
-yay -Sy neofetch google-chrome baidunetdisk nutstore-experimental xunlei-bin electronic-wechat-uos-bin linuxqq telegram-desktop libreoffice foxitreader qv2ray gitkraken lx-music visual-studio-code-bin clash-for-windows-bin whitesur-kde-theme-git serialtool typora-free-cn redis net-tools deepin-screenshot
+yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc zy-player-bin shotcut inkscape ninja
+
+yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop-appimage
 ```
 
 **输入法**
@@ -182,7 +186,7 @@ yay -Sy neofetch google-chrome baidunetdisk nutstore-experimental xunlei-bin ele
 ```bash
 sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color
 
-cat ~/.xprofile 
+vim ~/.xprofile 
 export QT_IM_MODULE=fcitx5
 ```
 
@@ -190,7 +194,8 @@ export QT_IM_MODULE=fcitx5
 
 ```bash
 yay -S fish
-curl -L https://get.oh-my.fish | fish 
+# curl -L https://get.oh-my.fish | fish 
+fish_config
 ```
 
 **toDesk**
@@ -220,7 +225,7 @@ sudo systemctl start fstrim.timer
 
 **SWAP 设置**
 
-https://wiki.archlinux.org/title/Swap#Swappiness
+<https://wiki.archlinux.org/title/Swap#Swappiness>
 
 - 查看 swap 使用率，一般是 60 ，意思是 60% 的概率将内存整理到 swap
 
@@ -234,7 +239,7 @@ https://wiki.archlinux.org/title/Swap#Swappiness
     sudo sysctl -w vm.swappiness=10
     ```
 
-- 修改配置文件：`sudo vim /etc/sysctl.d/99-swappiness.conf` 在文件末尾加上下面这行内容：` vm.swappiness=10`
+- 修改配置文件：`sudo vim /etc/sysctl.d/99-swappiness.conf` 在文件末尾加上下面这行内容：`vm.swappiness=10`
 
 - 重启后可查看 swappiness 的值
 
@@ -310,5 +315,25 @@ https://wiki.archlinux.org/title/Swap#Swappiness
         print('Boo!')
     ```
 
-    
+3. 内核更换
 
+    - Install The Desired Kernel
+
+        `sudo pacman -S linux-lts linux-lts-headers`
+
+    - Editing GRUB Config File
+
+        ```bash
+        sudo vim /etc/default/grub
+
+        # ---
+        `GRUB_DISABLE_SUBMENU=y`    # disables the GRUB submenu, i.e., it enables all the available kernels to be listed on the main GRUB Menu itself instead of the “Advanced option for Arch Linux” option.
+        `GRUB_DEFAULT=saved` # saves the last kernel used
+        `GRUB_SAVEDEFAULT=true` # makes sure that grub uses the last selected kernel is used as default
+        ```
+
+    - Re-Generate GRUB Configuration file
+
+        `sudo grub-mkconfig -o /boot/grub/grub.cfg`
+
+    - Choose Kernel From GRUB During Boot
