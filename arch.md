@@ -74,23 +74,23 @@
 
     ```bash
     arch-chroot /mnt
-
+    
     # 时区
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     hwclock --systohc
-
+    
     # hostname
     vim /etc/hostname
     ---
     键入：`arch`
     ---
-
+    
     # 设置 locale
     vim /etc/locale.conf
     ---
     键入：`LANG_en_US.UTF-8`
     ---
-
+    
     vim /etc/locale.gen
     ---
     取消注释：`#en_US.UTF-8 UTF-8`
@@ -102,17 +102,17 @@
     pacman -S networkmanager bluez bluez-utils pulseaudio-bluetooth alsa-utils pulseaudio pulseaudio-alsa 
     systemctl enable NetworkManager.service
     systemctl enable bluetooth.service
-
+    
     # root password
     passwd
     ---
     键入密码：xxxxxx
     ---
-
+    
     # ucode
     cat /proc/cpuinfo | grep "model name"
     pacman -S intel-ucode # amd-ucode
-
+    
     # 安装引导加载程序
     pacman -S grub efibootmgr os-prober
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
@@ -129,7 +129,7 @@
     ---
     键入密码
     ---
-
+    
     # 修改权限
     pacman -S sudo man-pages man-db
     vim /etc/sudoers
@@ -137,7 +137,7 @@
     取消注释：`%wheel ALL=(ALL:ALL) ALL`
     ---
     su - tianen
-
+    
     # KDE
     sudo pacman -S plasma xorg nvidia-lts dolphin konsole fish noto-fonts-cjk noto-fonts-emoji
     sudo systemctl enable sddm
@@ -233,6 +233,32 @@
     sudo systemctl enable fstrim.timer
     sudo systemctl start fstrim.timer
     ```
+
+---
+
+### picgo 配置
+
+**安装 picgo**
+
+```bash
+yay -S picgo
+```
+
+**picgo 配置 github**
+
+- github 获取 **token**
+
+  ![](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/Screenshot_20230912_221106.png))
+
+- PicGo 配置
+
+  ![image-20230912222947951](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/image-20230912222947951.png)
+
+  - 设定仓库名：上文在 GitHub 创建的仓库 `lutianen/PicBed`
+  - 设定分支名：`master`
+  - 设定 Token：上文生成的 token
+  - 指定存储路径：为空的话会上传到跟目录，也可以指定路径
+  - 设定自定义域名：可以为空，这里为了使用 CDN 加快图片的访问速度，按这样格式填写：[https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master](https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master)
 
 ---
 
