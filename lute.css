@@ -79,7 +79,7 @@
 
 @media print {
     html {
-        font-size: 0.45rem;
+        font-size: 0.9rem;
     }
 
     table,
@@ -96,7 +96,8 @@
     }
 
     @page {
-        size: A3;
+        size: A2;
+        font-size: 0.2rem;
         /* PDF output size */
         margin-left: 0;
         margin-right: 0;
@@ -199,7 +200,6 @@ h2 {
 h3 {
     padding-left: 0.2em;
     border-left: 0.2em dashed #2aa899;
-    border-bottom: 1px dashed #2aa899;
 }
 
 h1 tt,
