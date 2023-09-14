@@ -218,7 +218,7 @@
     ```bash
     yay -S clash-for-windows-bin 
 
-    yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc zy-player-bin wget ark shotcut inkscape ninja
+    yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc zy-player-bin wget ark shotcut inkscape ninja gnu-netcat
     
     yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop-appimage
     ```
@@ -294,6 +294,10 @@
 >    - `git push -u origin master` 
 >      - *由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来
 >      - *在以后的推送或者拉取时就可以简化命令*
+
+### Present Windows
+
+<img src="https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/202309141103383.png" alt="image-20230914110307330" style="zoom:67%;" />
 
 ### scp 
 
