@@ -1,5 +1,7 @@
 # Compile Qt 5.15.10 using mingw64 for Windows
 
+**温馨提示：从源码下载、解压、配置环境、编译源码、安装整套流程（`-skip qtwebengine -nomake tests -nomake examples`）大约需要 3 ~ 4 个小时（根据机器配置而定）**
+
 ## System requirements
 
 > pen a command prompt and ensure that the following tools can be found in the path : `perl -v`、`gcc -v`、`python -V`、`ruby -v`
