@@ -13,6 +13,8 @@
 
 ### 下载地址
 
+- [Qt5源码](https://download.qt.io/archive/qt/5.15/5.15.10/single/qt-everywhere-opensource-src-5.15.10.zip)
+
 - [MinGW](https://github.com/niXman/mingw-builds-binaries/releases/download/8.5.0-rt_v10-rev0/x86_64-8.5.0-release-posix-seh-rt_v10-rev0.7z)
 
   > ```powershell
@@ -89,7 +91,7 @@
 
   cd build
 
-  ..\configure.bat -static -release -prefix F:\Qt\Qt5.15.10 -confirm-license -opensource -platform win32-g++ -qt-sqlite -qt-zlib -qt-libpng -qt-libjpeg -opengl desktop -qt-pcre -qt-freetype -nomake tests -nomake examples -skip qtwebengine
+  ..\configure.bat -shared -debug-and-release -prefix F:\Qt\Qt5.15.10 -confirm-license -opensource -platform win32-g++ -qt-sqlite -qt-zlib -qt-libpng -qt-libjpeg -opengl desktop -qt-pcre -qt-freetype -nomake tests -nomake examples -skip qtlocation -skip qtwebengine
 
   # -prefix 指定安装将会部署的位置，根据自己情况修改
   # -debug-and-release 指示编译生成debug版和release版的Qt库
