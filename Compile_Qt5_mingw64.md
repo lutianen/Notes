@@ -51,6 +51,16 @@
   > ruby 3.1.1p18 (2022-02-18 revision 53f5fc4236) [i386-mingw32]
   > ```
 
+- [Python](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
+
+  > ```powershell
+  > # test
+  > python
+  > Python 3.8.10 (tags/v3.8.10:3d8993a, May  3 2021, 11:48:03) [MSC v.1928 64 bit (AMD64)] on win32
+  > Type "help", "copyright", "credits" or "license" for more information.
+  > >>> 
+  > ```
+
 ## Build
 
 - **Step 1. 设置临时环境变量**
