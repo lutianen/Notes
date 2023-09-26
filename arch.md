@@ -223,7 +223,20 @@
     yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop-appimage
     ```
 
-4. Golang
+4. you-get
+
+    命令行程序，提供便利的方式来下载网络上的媒体信息。
+
+    ```bash
+    yay -S you-get
+    ```
+
+    - 下载流行网站之音视频，例如YouTube, Youku, Niconico,以及更多
+    - 于您心仪的媒体播放器中观看在线视频，脱离浏览器与广告
+    - 下载您喜欢的网页上的图片
+    - 下载任何非HTML内容，例如二进制文件
+
+5. Golang
 
     ```bash
     # Download and install go
@@ -248,7 +261,7 @@
         └── src # 存放 go 源码，不同工程项目的代码以包名区分
         ```
 
-5. 优化
+6. 优化
 
     **TRIM**
 
@@ -269,7 +282,7 @@
 
    ```bash
    git config --global user.name "lutianen"
-   git config --global user.email 753766396@qq.com
+   git config --global user.email tianen.xd@gmail.com
    
    # check
    git config --list
@@ -278,7 +291,7 @@
 2. 生成密钥
 
    ```bash
-   ssh-keygen.exe -t rsa -C '753766396@qq.com'
+   ssh-keygen.exe -t rsa -C 'tianen.xd@gmail.com'
    ```
 
    > 上述代码执行完成后，要求多次输入密码，**请不要输入密码**
@@ -289,9 +302,7 @@
 
    2. 复制全部内容，在 Key 中粘贴
 
-      ![image-20211009162316486](C:\Users\957\AppData\Roaming\Typora\typora-user-images\image-20211009162316486.png)
-
-      ---
+---
 
 #### git 常用命令
 
