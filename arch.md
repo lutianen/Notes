@@ -354,7 +354,7 @@ yay -S picgo
 
 - github 获取 **token**
 
-  ![](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/Screenshot_20230912_221106.png))
+  ![](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/Screenshot_20230912_221106.png)
 
 - PicGo 配置
 
@@ -365,6 +365,18 @@ yay -S picgo
   - 设定 Token：上文生成的 token
   - 指定存储路径：为空的话会上传到跟目录，也可以指定路径
   - 设定自定义域名：可以为空，这里为了使用 CDN 加快图片的访问速度，按这样格式填写：[https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master](https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master)
+
+---
+
+### VirtualBox
+
+```bash
+sudo pacman -S virtualbox  # dkms
+
+sudo pacman -S virtualbox-host-dkms
+sudo dkms autoinstall
+sudo modprobe vboxdrv
+```
 
 ---
 
@@ -429,9 +441,9 @@ yay -S picgo
 # Install wg
 sudo pacman -S wireguard-tools
 # Open wg
-sudo wg-quic up wg0
+sudo wg-quick up wg0
 # Close wg
-sudo wg-quic down wg0
+sudo wg-quick down wg0
 ```
 
 **wg0.conf**
