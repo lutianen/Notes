@@ -123,7 +123,7 @@
     locale-gen
     
     # 网络管理器，蓝牙
-    pacman -S networkmanager bluez bluez-utils pulseaudio-bluetooth alsa-utils pulseaudio pulseaudio-alsa 
+    pacman -S networkmanager bluez bluez-utils pulseaudio-bluetooth alsa-utils pulseaudio pulseaudio-alsa sof-firmware
     systemctl enable NetworkManager.service
     systemctl enable bluetooth.service
     
