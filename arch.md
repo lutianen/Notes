@@ -201,18 +201,17 @@
     sudo pacman -S obs-studio
     ```
 
+    [Inputs](https://wiki.archlinuxcn.org/wiki/Fcitx5)
+
     ```bash
-    sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color
+    sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color fcitx5-pinyin-moegirl fcitx5-pinyin-zhwiki
 
-    # Create .xprofile and key `export QT_IM_MODULE=fcitx5`
-    vim ~/.xprofile 
-    export QT_IM_MODULE=fcitx5
-
-    # .pam_environment
-    GTK_IM_MODULE DEFAULT=fcitx
-    QT_IM_MODULE  DEFAULT=fcitx
-    XMODIFIERS    DEFAULT=\@im=fcitx
-    SDL_IM_MODULE DEFAULT=fcitx
+    # sudo vim /etc/environment
+    GTK_IM_MODULE=fcitx
+    QT_IM_MODULE=fcitx
+    XMODIFIERS=\@im=fcitx
+    # 为了让一些使用特定版本 SDL2 库的游戏能正常使用输入法
+    SDL_IM_MODULE=fcitx
     ```
 
     ```bash
@@ -220,7 +219,7 @@
 
     yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang
     
-    yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop-appimage
+    yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
     ```
 
 4. you-get
