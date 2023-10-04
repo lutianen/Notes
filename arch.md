@@ -369,6 +369,40 @@ UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
 
 ### picgo 配置
 
+#### picgo-core 【Recommend】 
+
+1. Download and Install **PigGo-Core**
+
+   ![image-20231004131236817](https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master/image-20231004131236817.png)
+
+2. Get **token** with GitHub
+
+   ![](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/Screenshot_20230912_221106.png)
+
+3. Configure `config.json`
+
+   ```json
+   {
+     "picBed": {
+       "current": "github",
+       "github": {
+         "repo": "lutianen/picBed", // 设定仓库名：上文在 GitHub 创建的仓库 `lutianen/PicBed`
+         "branch": "master", // 设定分支名：`master`
+         "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // 设定 Token：上文生成的 toke
+         "path": "", // 指定存储路径：为空的话会上传到根目录，也可以指定路径
+         "customUrl": "https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master" // 设定自定义域名：可以为空，这里为了使用 CDN 加快图片的访问速度，按这样格式填写：https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master
+       },
+       "uploader": "github",
+       "transformer": "path"
+     },
+     "picgoPlugins": {
+       "picgo-plugin-github-plus": true
+     }
+   }
+   ```
+
+#### picgo app 【Not Recommend】
+
 **安装 picgo**
 
 ```bash
