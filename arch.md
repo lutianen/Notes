@@ -46,30 +46,6 @@
     mount --mkdir /dev/nvme1n1p8 /mnt/home
     ```
 
-    **挂载其他硬盘分区**
-
-    ```bash
-    # Get UUID and TYPE
-    sudo blkid
-
-    # /dev/nvme1n1p3: LABEL="Document" BLOCK_SIZE="512" UUID="111915F1111915F1" TYPE="ntfs" PARTLABEL="Basic data partition" PARTUUID="666266ba-233b-11ed-95be-00e04c3656eb"
-
-    # Write UUID TYPE ...
-    sudo vim /etc/fstab
-
-    # <device> <dir> <type> <options> <dump> <fsck>
-    UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
-    ```
-
-    - `<device>` 描述要挂载的特定块设备或远程文件系统
-    - `<dir>` 描述挂载目录
-    - `<type>` 文件系统类型
-    - `<options>` 相关的挂载选项
-    - `<dump>` 会被 dump(8) 工具检查。该字段通常设置为 0, 以禁用检查
-    - `<fsck>` 设置引导时文件系统检查的顺序; 对于 root 设备该字段应该设置为 1。对于其它分区该字段应该设置为 2,或设置为 0 以禁用检查
-
-    **我使用 TYPE 为 `ntfs` 时导致启动失败，修改为 `ntfs3` 后成功挂载**
-
 5. 选择软件镜像仓库
 
     手动修改`/etc/pacman.d/mirrorlist`
@@ -355,6 +331,30 @@
 >    - `git push -u origin master`
 >      - *由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来
 >      - *在以后的推送或者拉取时就可以简化命令*
+
+### **挂载其他硬盘分区**
+
+```bash
+# Get UUID and TYPE
+sudo blkid
+
+# /dev/nvme1n1p3: LABEL="Document" BLOCK_SIZE="512" UUID="111915F1111915F1" TYPE="ntfs" PARTLABEL="Basic data partition" PARTUUID="666266ba-233b-11ed-95be-00e04c3656eb"
+
+# Write UUID TYPE ...
+sudo vim /etc/fstab
+
+# <device> <dir> <type> <options> <dump> <fsck>
+UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
+```
+
+- `<device>` 描述要挂载的特定块设备或远程文件系统
+- `<dir>` 描述挂载目录
+- `<type>` 文件系统类型
+- `<options>` 相关的挂载选项
+- `<dump>` 会被 dump(8) 工具检查。该字段通常设置为 0, 以禁用检查
+- `<fsck>` 设置引导时文件系统检查的顺序; 对于 root 设备该字段应该设置为 1。对于其它分区该字段应该设置为 2,或设置为 0 以禁用检查
+
+**我使用 TYPE 为 `ntfs` 时导致启动失败，修改为 `ntfs3` 后成功挂载**
 
 ### Present Windows
 
