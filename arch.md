@@ -373,7 +373,7 @@ UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
 
 1. Download and Install **PigGo-Core**
 
-   ![image-20231004131236817](https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master/image-20231004131236817.png)
+   ![image-20231004132814030](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/image-20231004132814030.png)
 
 2. Get **token** with GitHub
 
@@ -381,16 +381,18 @@ UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
 
 3. Configure `config.json`
 
+   **NOTE：When using `~/.picgo/config.json`, delete the comments to avoid unnecessary trouble（使用时，将注释删掉，以免产生不必要的麻烦）**
+   
    ```json
    {
      "picBed": {
        "current": "github",
        "github": {
-         "repo": "lutianen/picBed", // 设定仓库名：上文在 GitHub 创建的仓库 `lutianen/PicBed`
+         "repo": "lutianen/PicBed", // 设定仓库名：上文在 GitHub 创建的仓库 `lutianen/PicBed`
          "branch": "master", // 设定分支名：`master`
          "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // 设定 Token：上文生成的 toke
          "path": "", // 指定存储路径：为空的话会上传到根目录，也可以指定路径
-         "customUrl": "https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master" // 设定自定义域名：可以为空，这里为了使用 CDN 加快图片的访问速度，按这样格式填写：https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master
+         "customUrl": "" // 设定自定义域名：可以为空
        },
        "uploader": "github",
        "transformer": "path"
@@ -412,8 +414,6 @@ yay -S picgo
 **picgo 配置 github**
 
 - github 获取 **token**
-
-  ![](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/Screenshot_20230912_221106.png)
 
 - PicGo 配置
 
