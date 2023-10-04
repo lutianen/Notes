@@ -369,7 +369,7 @@ UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
 
 ### picgo 配置
 
-#### picgo-core 【Recommend】 
+#### picgo-core 【Recommend】
 
 1. Download and Install **PigGo-Core**
 
@@ -377,12 +377,12 @@ UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
 
 2. Get **token** with GitHub
 
-   ![](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/Screenshot_20230912_221106.png)
+   ![Token](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/Screenshot_20230912_221106.png)
 
 3. Configure `config.json`
 
    **NOTE：When using `~/.picgo/config.json`, delete the comments to avoid unnecessary trouble（使用时，将注释删掉，以免产生不必要的麻烦）**
-   
+
    ```json
    {
      "picBed": {
@@ -459,7 +459,7 @@ sudo modprobe vboxdrv
 
 - 重启后可查看 swappiness 的值
 
-    ![image-20230723115427188](https://raw.githubusercontent.com/lutianen/PicBed/main/202307231154321.png)
+    ![image-20230723115427188](https://raw.githubusercontent.com/lutianen/PicBed/master/202307231154321.png)
 
 ---
 
@@ -532,12 +532,12 @@ sudo pacman -S openresolv
 
 1. WARP 密钥获取：Telegram 中 **Warp+ Bot** 获取
 
-![image-20230722173251745](https://raw.githubusercontent.com/lutianen/PicBed/main/202307221732768.png)
+![image-20230722173251745](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221732768.png)
 
 2. 配置文件生成：<https://replit.com/@misaka-blog/wgcf-profile-generator?v=1>
 
-![image-20230722173030527](https://raw.githubusercontent.com/lutianen/PicBed/main/202307221730585.png)
+![image-20230722173030527](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221730585.png)
 
 3. 优选IP **==warp-yxip==**
 
-![image-20230722173556110](https://raw.githubusercontent.com/lutianen/PicBed/main/202307221735152.png)
+![image-20230722173556110](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221735152.png)
