@@ -64,7 +64,7 @@
 6. 安装基础包
 
     ```bash
-    pacstrap /mnt bash base base-devel linux-lts  linux-headers linux-firmware vim
+    pacstrap /mnt bash base base-devel linux-lts  linux-headers linux-firmware neovim xsel
 
     // fstab
     genfstab -U -p /mnt >> /mnt/etc/fstab
