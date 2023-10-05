@@ -7,3 +7,5 @@
 - [Google C++ 编程规范](./Google_C++_Style_Guide.md)
 
 - [Compile Qt5 with mingw64](./Compile_Qt5_mingw64.md)
+
+- [Neovim 相关配置](./neovim.md)
