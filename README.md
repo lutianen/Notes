@@ -9,3 +9,6 @@
 - [Compile Qt5 with mingw64](./Compile_Qt5_mingw64.md)
 
 - [Neovim 相关配置](./neovim.md)
+
+- [秋招刷题笔记](./autumn_code.md)
+
