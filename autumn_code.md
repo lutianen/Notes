@@ -117,6 +117,263 @@
   }
   ```
 
+
+## 多线程
+
+### `std::thread` 与 `pthread` 创建线程消耗对比
+
+C++ 标准库中的 thread 库
+
+```cpp
+#include <benchmark/benchmark.h>
+#include <thread>
+
+void BM_for(benchmark::State& bm) {
+    for (auto _:bm) {
+        std::thread t1([](){
+        });
+        t1.join();
+    }
+}
+BENCHMARK(BM_for);
+BENCHMARK_MAIN();
+
+/*
+    2023-09-08T14:40:17+08:00
+    Run on (16 X 4600 MHz CPU s)
+    CPU Caches:
+    L1 Data 48 KiB (x8)
+    L1 Instruction 32 KiB (x8)
+    L2 Unified 1280 KiB (x8)
+    L3 Unified 24576 KiB (x1)
+    Load Average: 3.26, 2.91, 2.36
+    ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+    -----------------------------------------------------
+    Benchmark           Time             CPU   Iterations
+    -----------------------------------------------------
+    BM_for          14138 ns         8664 ns        71463
+
+    14138 ns -->> 14.138 us
+*/
+```
+
+Linux 中的 pthread 库
+
+```cpp
+#include <benchmark/benchmark.h>
+#include <pthread.h>
+
+void* threadFunc (void*) { return nullptr; }
+
+void BM_for(benchmark::State& bm) {
+    for (auto _:bm) {
+        pthread_t pid;
+        pthread_create(&pid, nullptr,
+            threadFunc, nullptr);
+
+        pthread_join(pid, nullptr);
+    }
+}
+BENCHMARK(BM_for);
+BENCHMARK_MAIN();
+
+/*
+    2023-09-08T14:45:26+08:00
+    Run on (16 X 4600 MHz CPU s)
+    CPU Caches:
+    L1 Data 48 KiB (x8)
+    L1 Instruction 32 KiB (x8)
+    L2 Unified 1280 KiB (x8)
+    L3 Unified 24576 KiB (x1)
+    Load Average: 2.63, 2.55, 2.34
+    ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+    -----------------------------------------------------
+    Benchmark           Time             CPU   Iterations
+    -----------------------------------------------------
+    BM_for          13346 ns         8402 ns        72869
+
+    13346 ns -->> 13.346 us
+*/
+```
+
+### `std::async`
+
+特点
+- `std::async` 接受一个带返回值的 Lambda, 自身返回一个 `std::future` 对象
+- Lambda 可以返回 `void`, 此时`std::future` 对象类型为 `std::future<void>`
+- Lambda 在另一个线程中执行, 最后调用 `future` 对象的 `get` 函数（如果此时 Lambda 未执行完成，则会等待）获取返回值
+- **`std::future` 删除了拷贝构造函数、拷贝赋值函数**, 因此如果需要浅拷贝，实现共享同一个 `future` 对象, 则改用 `std::shared_future`
+
+```cpp
+#include <chrono>
+#include <future>
+#include <iostream>
+#include <thread>
+
+void download(const string& str) {
+    for (size_t i = 0; i <= 10; ++i)
+        printf("%s downloading ... %zu\% \r\n", str.c_str(), i * 10);
+    printf("%s download finished. \r\n", str.c_str(), i * 10);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+}
+
+int main() {
+    std::future<int> ftr = std::async([&](){
+        download("Lute.tar.gz");
+        return 12;
+    });
+    int rc = ftr.get();
+    std::cout << "rc = " << rc << std::endl;
+    return 0;
+}
+```
+
+### `std::mutex` 互斥锁
+
+互斥量，防止多个线程同时进入某一段代码：`lock()` / `unlock()`
+
+`std::lock_guard` 符合 RAII 思想的上锁和解锁：`std::lock_guard lock(mtx);`
+
+- 在构造函数中调用 `mtx.lock();`, 上锁
+- 在析构函数中调用 `mtx.unlock();`, 在离开作用域时自动解锁
+- **`std::lock_guard` 无非是调用其构造参数为 `lock()` 的成员函数，因此 `std::unique_lock()` 也可以作为 `std::lock_guard` 的构造参数**
+    ```cpp
+    mutex mtx;
+    unique_lock<mutex> u_lock(mtx);
+    lock_guard<unique_lock> lock(u_lock);
+    ```
+
+---
+
+`std::unique_lock`, 不仅仅符合 RAII 思想，而且自由度更高（可以提前释放 `mtx.unlock()`）：*`std::unique_lock<mutex> lock(mtx)` 在析构函数调用时，会检测额外的 FLAG 标志（标志 `mtx` 是否已被释放），然后在决定是否调用 `mtx.unlock();`*
+
+`std::unique_lock` 具有 `mutex` 的所有成员函数：`lock()` / `try_lock()` / `try_lock_for()` 等，且还会在析构时自动调用 `unlock()`
+
+> 概念 concept（鸭子类型）：只要具有某些特定名字的成员函数，就判断一个类是否满足某些功能的思想，在 C++ 中称为 concept（概念）， 而在 Python 中成为鸭子类型
+>
+> 比起虚函数和动态多态的接口抽象，concept 使实现和接口更加解耦且没有性能损失
+
+### `std::condition_variable` 条件变量
+
+**必须和`std::unique_lock<mutex> lock(mtx)` 一起使用**
+
+- `cv.wait(lock);` 将会让当前线程陷入等待，该函数还可以额外指定一个参数`expr`（`expr` 是一个 Lambda，只有其返回值为 `true` 时才会真正唤醒，否则继续等待）, 即`cv.wait(lock, expr)`
+- `cv.notify_one();` 唤醒某个陷入等待的线程；
+- `cv.notify_all();` 唤醒所有陷入等待的线程；
+
+### `n` 个线程交替打印本线程 ID(0 ~ n - 1), 重复打印 `m` 次
+
+```cpp
+#include <atomic>
+#include <iostream>
+#include <thread>
+#include <vector>
+
+std::atomic_int g_cnt {0};
+std::atomic_int g_m{0};
+std::vector<std::thread> g_threads;
+
+int main() {
+    int n = 4, m = 2;
+    g_m.store(m);
+
+    for (int i = 0; i < n; ++i) {
+        g_threads.push_back(
+            std::move(
+                std::thread (
+                    [&](int thread_id){
+                        while (g_m.load() > 0) {
+                            if (g_cnt.load() == thread_id) {
+                                std::cout << thread_id << std::endl;
+                                g_cnt.fetch_add(1);
+                                if (g_cnt.load() == n) {
+                                    g_m.fetch_sub(1);
+                                    g_cnt.store(0);
+                                }
+                            }
+                        }
+                    }, i
+                )
+            )
+        );
+    }
+
+    for (auto& thread : g_threads) thread.join();
+    return 0;
+}
+```
+
+### 生产者 - 消费者模式
+
+```cpp
+template <typename T>
+class MTQuque {
+public:
+    void push(T val) {
+        std::unique_lock<mutex> lock(mtx_);
+        vec_.push_back(std::move(val));
+        cv_.notify_one();
+    }
+
+    T pop() {
+        std::unique_lock<mutex> lock(mtx_);
+        cv_.wait(lock, [this] () { return !vec_.empty(); });
+        T temp = std::move(vec_.back());
+        vec_.pop_back();
+        return temp;
+    }
+
+    void pushMany(std::initializer_list<T> vals) {
+        std::unique_lock<mutex> lock(mtx_);
+        std::copy(std::move_iterator<decltype(vals.begin())>(vals.begin()), 
+                    std::move_iterator<decltype(vals.end())>(valid.end()), 
+                    std::back_iterator<std::vector<T>>(vec_));
+        cv_.notify_all();
+    }
+
+private:
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::vector<T> vec_;
+};
+
+int main() {
+    MTQuque<int> foods;
+    std::thread t1([&](){
+        for (int i = 0; i < 2; ++i) {
+            auto food = foods.pop();
+            std::cout << food << std::endl;
+        }
+    });
+
+    std::thread t2([&] () {
+        for (int i = 0; i < 2; ++i) {
+            auto food = foods.pop();
+            std::cout << food << std::endl;
+        }
+    });
+
+    foods.push(12);
+    foods.push(13);
+
+    foods.pushMany({14, 15});
+
+    t1.join();
+    t2.join();
+    return 0;
+}
+```
+
+
+## 智能指针
+
+**unique_ptr**: 底层是一个`tuple`，存储的是`指针`和对应的`Deleter`
+
+**shared_ptr**: 底层是两根指针，一根指向资源，一根指向原子变量的引用计数；
+
+![unique_ptr](https://raw.githubusercontent.com/lutianen/PicBed/master/smart_pointer.svg)
+
 ## List
 
 ### List 通用操作
@@ -1434,6 +1691,271 @@ bool wordBreak(string s, vector<string>& wordDict) {
 
 ### [两个字符串的删除操作](https://leetcode.cn/problems/delete-operation-for-two-strings/)
 
-```cpp
+给定两个单词 word1 和 word2 ，返回使得 word1 和  word2 相同所需的最小步数
 
+每步 可以删除任意一个字符串中的一个字符
+
+```cpp
+int minDistance(string word1, string word2) {
+    if (word1.empty()) return word2.size();
+    if (word2.empty()) return word1.size();
+
+    // dp[i][j] : 使得 word1[0, i - 1) 与 word2[0, j - 1) 相同的最小步数
+    vector<vector<int>> dp(word1.size() + 1, vector<int>(word2.size() + 1));
+    dp[0][0] = 0;
+    for (int i = 0; i <= word1.size(); ++i) dp[i][0] = i;
+    for (int j = 0; j <= word2.size(); ++j) dp[0][j] = j;
+
+    for (int i = 1; i <= word1.size(); ++i) {
+        for (int j = 1; j <= word2.size(); ++j) {
+            if (word1[i - 1] == word2[j - 1]) // dp[i][j]: word1[i - 1] vs word2[j - 1]
+                dp[i][j] = dp[i - 1][j - 1];
+            else
+                dp[i][j] = min(dp[i][j - 1], dp[i - 1][j]) + 1;
+        }
+    }
+
+    return dp[word1.size()][word2.size()];
+}
 ```
+
+- 删除之后，得到的结果就是最长公共子序列
+
+### [编辑距离](https://leetcode.cn/problems/edit-distance/)
+
+给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数
+
+可以对一个单词进行如下三种操作：
+
+- 插入一个字符
+- 删除一个字符
+- 替换一个字符
+
+```cpp
+int minDistance(string word1, string word2) {
+    // dp[i][j]: 将 word1[0, i - 1) 转换成 word2[0, j - 1) 所需最小操作数
+    vector<vector<int>> dp(word1.size() + 1, vector<int>(word2.size() + 1));
+    dp[0][0] = 0;
+
+    for (int i = 0; i <= word1.size(); ++i) dp[i][0] = i;
+    for (int j = 0; j <= word2.size(); ++j) dp[0][j] = j;
+
+    for (int i = 1; i <= word1.size(); ++i) {
+        for (int j = 1; j <= word2.size(); ++j) {
+            if (word1[i - 1] == word2[j - 1])
+                dp[i][j] = dp[i - 1][j - 1];
+            else
+                dp[i][j] = min(
+                    min(dp[i - 1][j] /* 删除 */, dp[i][j - 1]), /* 插入*/
+                    dp[i - 1][j - 1] /* 修改 */) + 1;
+        }
+    }
+
+    return dp[word1.size()][word2.size()];
+}
+```
+
+### [最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/)
+
+给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度
+
+如果不存在 公共子序列 ，返回 `0`
+
+一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串
+
+两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列
+
+```cpp
+int longestCommonSubsequence(string s1, string s2) {
+    if (s1.empty() || s2.empty()) return 0;
+
+    // dp[i]][j]: 子串 s1[0, i - 1) 与子串 s2[0, j - 1) 的最长公共子序列长度
+    vector<vector<int>> dp(s1.size() + 1, vector<int>(s2.size() + 1));
+    dp[0][0] = 0;
+
+    for (int i = 0; i <= s1.size(); ++i) dp[i][0] = 0;
+    for (int j = 0; j <= s2.size(); ++j) dp[0][j] = 0;
+
+    for (int i = 1; i <= s1.size(); ++i) {
+        for (int j = 1; j <= s2.size(); ++j) {
+            if (s1[i - 1] == s2[j - 1])
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            else
+                dp[i][j] = max(dp[i][j - 1], dp[i - 1][j]);
+        }
+    }
+
+    return dp[s1.size()][s2.size()];
+}
+```
+
+### [最大子数组和](https://leetcode.cn/problems/maximum-subarray/)
+
+给你一个整数数组`nums`，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和
+
+子数组是数组中的一个连续部分
+
+```cpp
+int maxSubArray(vector<int>& nums) {
+    // dp[i] 表示以 nums[i - 1] 为结尾且具有最大和的子数组的最大和（即满足条件的子数组的最大和）
+    vector<int> dp(nums.size() + 1);
+    dp[0] = -0x3F3F3F3F;
+
+    for (size_t i = 1; i <= nums.size(); ++i) {
+        dp[i] = max(nums[i - 1], dp[i - 1] + nums[i - 1]);
+    }
+
+    return *max_element(dp.begin(), dp.end());
+}
+```
+
+## 贪心 Greedy
+
+[无重叠区间](https://leetcode.cn/problems/non-overlapping-intervals/)
+
+给定一个区间的集合`intervals`，其中 `intervals[i] = [starti, endi]`
+
+返回 需要移除区间的最小数量，使剩余区间互不重叠 
+
+```cpp
+/* Dynamic Planning: Timeout
+ * 本质：最长上升子序列，即找到最多的无重叠区间
+ */
+int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+    if (intervals.empty()) return 0;
+
+    sort(intervals.begin(), intervals.end(), 
+        [](vector<int>& u, vector<int>& v){
+            return u[0] < v[0];
+    });
+
+        
+    // f[i] 表示以 i 区间为最后一个区间时, 可选出的最大区间数量
+    vector<int> f(intervals.size(), 1);
+
+    for (int i = 1; i < intervals.size(); ++i) {
+        for (int j = 0; j < i; ++j) {
+            if (intervals[i][0] >= intervals[j][1])
+                f[i] = max(f[i], f[j] + 1);
+        }
+    }
+    return intervals.size() - *max_element(f.begin(), f.end());
+}
+
+/* Greedy */
+int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+    if (intervals.empty()) return 0;
+
+    sort(intervals.begin(), intervals.end(), 
+        [](vector<int>& u, vector<int>& v){
+            return u[1] < v[1];
+    });
+    
+    int cnt = 1; // 至少有一个区间
+    int curr_end = intervals[0][1]; // The end of Current Interval
+    for (const auto& interval : intervals) {
+        int next_start = interval[0]; // The start of Next Interval
+
+        if (next_start >= curr_end) { // Find an valid interval
+            curr_end = interval[1];
+            ++cnt;
+        }
+    }
+
+    return intervals.size() - cnt;
+}
+```
+
+### [用最少数量的箭矢引爆气球](https://leetcode.cn/problems/minimum-number-of-arrows-to-burst-balloons/)
+
+一支弓箭可以沿着`x`轴从不同点 完全垂直 地射出
+
+在坐标`x`处射出一支箭，若有一个气球的直径的开始和结束坐标为`xstart`，`xend`， 且满足`xstart ≤ x ≤ xend`，则该气球会被引爆
+
+可以射出的弓箭的数量 没有限制 。 弓箭一旦被射出之后，可以无限地前进
+
+给你一个数组 `points` ，返回引爆所有气球所必须射出的 最小 弓箭数
+
+```cpp
+int findMinArrowShots(vector<vector<int>>& points) {
+    if (points.empty()) return 0;
+
+    // 按照末尾位置从小到大排序
+    sort(points.begin(), points.end(),
+            [] (vector<int>& u, vector<int>& v) {
+                return u[1] < v[1];
+            });
+    
+    int cnt = 1;  // 最少需要一支箭
+    int curr_end = points[0][1], next_start;  // 
+    for (const auto& point : points) {
+        next_start = point[0];
+
+        if (curr_end < next_start) { // 只有两个气球不挨着时，才需要另一支箭，并更新 curr_end
+            ++cnt;
+            curr_end = point[1];
+        }
+    }
+
+    return cnt;
+}
+```
+
+### [跳跃游戏](https://leetcode.cn/problems/jump-game/)
+
+给你一个非负整数数组 `nums`，你最初位于数组的 第一个下标
+
+数组中的每个元素代表你在该位置可以跳跃的最大长度
+
+判断你是否能够到达最后一个下标，如果可以，返回 `true` ；否则，返回 `false`
+
+```cpp
+bool canJump(vector<int>& nums) {
+    if (nums.empty()) return true;
+
+    // 所能达到最远的位置
+    int cover = nums[0];
+
+    for (int i = 0; i <= cover; ++i) {
+        if (cover >= nums.size() - 1) return true;
+        if (cover <= nums[i] + i) cover = nums[i] + i;
+    }
+    return false;
+}
+```
+
+### [视频拼接](https://leetcode.cn/problems/video-stitching/)
+
+使用数组 `clips` 描述所有的视频片段，其中 `clips[i] = [starti, endi]` 表示：某个视频片段开始于 `starti` 并于 `endi` 结束
+
+需要将这些片段进行再剪辑，并将剪辑后的内容拼接成覆盖整个运动过程的片段（`[0, time]`）。
+
+返回所需片段的最小数目，如果无法完成该任务，则返回`-1`
+
+```cpp
+int videoStitching(vector<vector<int>>& clips, int time) {
+    if (time <= 0) return -1;
+
+    // 按起点从小到大排序（起点相同时，按右端点降序排序）
+    sort (clips.begin(), clips.end(),
+        [] (const vector<int>& u, const vector<int>& v) {
+            return u[0] == v[0] ? u[1] < v[1] : u[0] < v[0];
+        });
+
+    int i = 0, cnt = 0, curr_end = 0, next_end = -0x3F3F3F3F;
+    while (i < clips.size() && clips[i][0] <= curr_end) {
+        // 当多个“下一区间的左端点” 位于 “当前区间右端点“ 内部时，找到最大的右端点
+        while(i < clips.size() && curr_end >= clips[i][0]) {
+            next_end = max(next_end, clips[i][1]);
+            ++i;
+        }
+
+        curr_end = next_end;
+        ++cnt;
+
+        if (curr_end >= time) return cnt; //  类似于跳跃游戏，以满足要求，直接返回
+    }
+    return -1;
+}
+```
+
