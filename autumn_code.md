@@ -117,7 +117,6 @@
   }
   ```
 
-
 ## 多线程
 
 ### `std::thread` 与 `pthread` 创建线程消耗对比
@@ -199,6 +198,7 @@ BENCHMARK_MAIN();
 ### `std::async`
 
 特点
+
 - `std::async` 接受一个带返回值的 Lambda, 自身返回一个 `std::future` 对象
 - Lambda 可以返回 `void`, 此时`std::future` 对象类型为 `std::future<void>`
 - Lambda 在另一个线程中执行, 最后调用 `future` 对象的 `get` 函数（如果此时 Lambda 未执行完成，则会等待）获取返回值
@@ -238,13 +238,14 @@ int main() {
 - 在构造函数中调用 `mtx.lock();`, 上锁
 - 在析构函数中调用 `mtx.unlock();`, 在离开作用域时自动解锁
 - **`std::lock_guard` 无非是调用其构造参数为 `lock()` 的成员函数，因此 `std::unique_lock()` 也可以作为 `std::lock_guard` 的构造参数**
+
     ```cpp
     mutex mtx;
     unique_lock<mutex> u_lock(mtx);
     lock_guard<unique_lock> lock(u_lock);
     ```
 
----
+    ---
 
 `std::unique_lock`, 不仅仅符合 RAII 思想，而且自由度更高（可以提前释放 `mtx.unlock()`）：*`std::unique_lock<mutex> lock(mtx)` 在析构函数调用时，会检测额外的 FLAG 标志（标志 `mtx` 是否已被释放），然后在决定是否调用 `mtx.unlock();`*
 
@@ -365,7 +366,6 @@ int main() {
 }
 ```
 
-
 ## 智能指针
 
 **unique_ptr**: 底层是一个`tuple`，存储的是`指针`和对应的`Deleter`
@@ -374,7 +374,86 @@ int main() {
 
 ![unique_ptr](https://raw.githubusercontent.com/lutianen/PicBed/master/smart_pointer.svg)
 
-## List
+    ---
+
+## Array 数组
+
+### [数组中重复的数字](https://www.nowcoder.com/practice/6fe361ede7e54db1b84adc81d09d8524?tpId=265&tqId=39207&rp=1&ru=/exam/oj/ta&qru=/exam/oj/ta&sourceUrl=%2Fexam%2Foj%2Fta%3FtpId%3D13&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+在一个长度为n的数组里的所有数字都在0到n-1的范围内
+
+数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中任意一个重复的数字。
+
+```cpp
+int duplicate(vector<int>& nums) {
+    unordered_set<int> uset;
+
+    for (const auto& num : nums) {
+        if (uset.find(num) == uset.end()) {
+            uset.insert(num);
+        } else 
+            return num;
+    }
+    return -1;
+}
+```
+
+```go
+func duplicate( numbers []int ) int {
+    var uset = map[int]int{} // 类似于 C++ 中的 unordered_set
+
+    for i := 0; i < len(numbers); i++ {
+        if _, ok := uset[numbers[i]]; ok { // 判断 numbers[i] 是否在 uset 容器中
+            return numbers[i]
+        } else {
+            uset[numbers[i]] = numbers[i]
+        }
+    }
+    return -1
+}
+```
+
+### [二维数组中的查找](https://www.nowcoder.com/practice/abc3fe2ce8e146608e868a70efebf62e?tpId=265&tqId=39208&rp=1&ru=/exam/oj/ta&qru=/exam/oj/ta&sourceUrl=%2Fexam%2Foj%2Fta%3FtpId%3D13&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+在一个二维数组array中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。
+
+请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
+
+```cpp
+bool Find(int target, vector<vector<int> >& array) {
+    int i = array.size() - 1, j = 0;
+    
+    while (i >= 0 && i < array.size() && j >= 0 && j < array[0].size()) {
+        if (array[i][j] < target) {
+            ++j;
+        } else if (array[i][j] > target) {
+            --i;
+        } else 
+            return true;
+    }
+    return false;
+}
+```
+
+```go
+func Find(target int, array [][]int) bool {
+    i, j := len(array) - 1, 0
+
+    for i >= 0 && i < len(array) && j >= 0 && j < len(array[0]) {
+        if array[i][j]  < target {
+            j++
+        } else if array[i][j] > target {
+            i--
+        } else { 
+            return true
+        }
+    }
+
+    return false
+}
+```
+
+## List 链表
 
 ### List 通用操作
 
@@ -417,6 +496,62 @@ int main() {
     }
   }
   ```
+
+### [从尾到头打印链表](https://www.nowcoder.com/practice/d0267f7f55b3412ba93bd35cfa8e8035?tpId=265&tqId=39210&rp=1&ru=/exam/oj/ta&qru=/exam/oj/ta&sourceUrl=%2Fexam%2Foj%2Fta%3FtpId%3D13&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+输入一个链表的头节点，按链表从尾到头的顺序返回每个节点的值（用数组返回）
+
+```cpp
+vector<int> printListFromTailToHead(ListNode* head) {
+    ListNode* curr = head;
+    vector<int> res;
+
+    while (curr != nullptr) {
+        res.push_back(curr->val);
+        curr = curr->next;
+    }
+    reverse(res.begin(), res.end());
+    return res;
+}
+```
+
+```go
+type ListNode struct {
+    Val int
+    Next *ListNode
+}
+
+func printListFromTailToHead(head *ListNode) []int{
+    var res []int
+    if head == nil {
+        return res
+    }
+
+    curr := head
+    for curr != nil {
+        res = append(res, curr.Val)
+        curr = curr.Next
+    }
+
+    reverse(res)
+    return res
+}
+
+func reverse(array []int) {
+    n := len(array)
+
+    for i := 0; i < n >> 1; i++ {
+        swap(&array[i], &array[n - 1 - i])
+    }
+}
+
+func swap(a *int, b *int) {
+    var temp int
+    temp = *a
+    *a = *b
+    *b = temp
+}
+```
 
 ### [合并 K 个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/)
 
@@ -662,7 +797,7 @@ ListNode *deleteDuplicates(ListNode* head) {
 }
 ```
 
----
+    ---
 
 ## 字符串
 
@@ -686,6 +821,350 @@ size_t countMinimun(const string& str) {
         i = j;
     }
     return cnt;
+}
+```
+
+### [替换空格](https://www.nowcoder.com/practice/0e26e5551f2b489b9f58bc83aa4b6c68?tpId=265&tqId=39209&rp=1&ru=/exam/oj/ta&qru=/exam/oj/ta&sourceUrl=%2Fexam%2Foj%2Fta%3FtpId%3D13&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+```cpp
+string replaceSpace(string s) {
+    string res;
+    for (const auto& ch : s) {
+        if (ch == ' ')
+            res += "%20";
+        else
+            res.push_back(ch);
+    }
+    return res;
+}
+```
+
+```go
+func replaceSpace(s string) string {
+  var ret string
+
+  for i := 0; i < len(s); i++ {
+    if s[i] == ' ' {
+      ret += "%20"
+    } else {
+      ret += string(s[i])
+    }
+  }
+
+  return ret
+}
+```
+
+## Tree 树
+
+### 通用操作
+
+```cpp
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+
+    TreeNode () : val(0), left(nullptr), right(nullptr) {}
+    TreeNode (int v) : val(v), left(nullptr), right(nullptr) {}
+    TreeNode (int v, TreeNode *l, TreeNode *r) : val(v), left(l), right(r) {}
+};
+```
+
+### [重建二叉树](https://www.nowcoder.com/practice/8a19cbe657394eeaac2f6ea9b0f6fcf6?tpId=265&tqId=39211&rp=1&ru=/exam/oj/ta&qru=/exam/oj/ta&sourceUrl=%2Fexam%2Foj%2Fta%3FtpId%3D13&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+给定节点数为 n 的二叉树的前序遍历和中序遍历结果，请重建出该二叉树并返回它的头结点
+
+- vin.length == pre.length
+- pre 和 vin 均无重复元素
+- vin出现的元素均出现在 pre里
+- 只需要返回根结点
+
+```cpp
+TreeNode* reConstructBinaryTree(vector<int>& preOrder, vector<int>& vinOrder) {
+    if (preOrder.empty() || vinOrder.empty()) return nullptr;
+    
+    int root_val = preOrder[0];
+    size_t idx = 0;
+    for (; idx < vinOrder.size(); ++idx) {
+        if (vinOrder[idx] == root_val) break;
+    }
+
+    vector<int> vinOrder_left(vinOrder.begin(), vinOrder.begin() + idx);
+    vector<int> vinOrder_right(vinOrder.begin() + idx + 1, vinOrder.end());
+
+    vector<int> preOrder_left(preOrder.begin() + 1,
+                              preOrder.begin() + 1 + vinOrder_left.size());
+    vector<int> preOrder_right(preOrder.begin() + 1 + vinOrder_left.size(), preOrder.end());
+
+    TreeNode* root = new TreeNode(root_val);
+
+    root->left = reConstructBinaryTree(preOrder_left, vinOrder_left);
+    root->right = reConstructBinaryTree(preOrder_right, vinOrder_right);
+
+    return root;
+}
+```
+
+```go
+type TreeNode struct {
+    Val int
+    Left *TreeNode
+    Right *TreeNode
+}
+
+func reConstructBinaryTree(preOrder []int, vinOrder []int) *TreeNode {
+    if len(preOrder) == 0 || len(vinOrder) == 0 {
+      return nil
+    }
+
+    root_val, idx := preOrder[0], 0
+    for idx < len(vinOrder) {
+      if vinOrder[idx] == root_val {
+        break
+      }
+      idx++
+    }
+
+    vinOrder_left, vinOrder_right := vinOrder[ : idx], vinOrder[idx + 1 : ]
+    fmt.Println(len(vinOrder_left), len(vinOrder_right))
+
+    preOrder_left, preOrder_right := preOrder[1 : len(vinOrder_left) + 1], preOrder[len(vinOrder_left) + 1:]
+    fmt.Println(len(preOrder_left), len(preOrder_right))
+
+    root := new(TreeNode)
+    root.Val = root_val
+    root.Left = reConstructBinaryTree(preOrder_left, vinOrder_left)
+    root.Right = reConstructBinaryTree(preOrder_right, vinOrder_right)
+
+    return root
+}
+```
+
+### [二叉树的下一个节点](https://www.nowcoder.com/practice/9023a0c988684a53960365b889ceaf5e?tpId=265&tqId=39212&rp=1&ru=/exam/oj/ta&qru=/exam/oj/ta&sourceUrl=%2Fexam%2Foj%2Fta%3FtpId%3D13&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+给定一个二叉树其中的一个结点，请找出中序遍历顺序的下一个结点并且返回
+
+注意，树中的结点不仅包含左右子结点，同时包含指向父结点的next指针
+
+```cpp
+struct TreeLinkNode {
+    int val;
+    TreeLinkNode *left;
+    TreeLinkNode *right;
+    TreeLinkNode *next;
+
+    TreeLinkNode (int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+TreeLinkNode* GetNext(TreeLinkNode* pNode) {
+    function <TreeLinkNode*(TreeLinkNode*)> getParent = [&] (TreeLinkNode * curr) {
+        if (curr->next == nullptr)
+            return curr;
+        else
+            return getParent(curr->next);
+    };
+
+    TreeLinkNode* root = getParent(pNode);
+    vector<TreeLinkNode*> vin_vec{};
+
+    function<void(TreeLinkNode*)> vinOrder = [&] (TreeLinkNode * root) {
+        if (root == nullptr)
+            return;
+
+        vinOrder(root->left);
+        vin_vec.push_back(root);
+        vinOrder(root->right);
+    };
+    vinOrder(root);
+
+    TreeLinkNode* rc = nullptr;
+    for (size_t i = 0; i < vin_vec.size(); ++i) {
+        if (vin_vec[i] == pNode) {
+            rc = vin_vec[i + 1];
+            break;
+        }
+    }
+
+    return rc;
+}
+```
+
+```go
+type TreeLinkNode struct {
+ Val   int
+ Left  *TreeLinkNode
+ Right *TreeLinkNode
+ Next  *TreeLinkNode
+}
+
+func getParent(curr *TreeLinkNode) *TreeLinkNode {
+ if curr == nil {
+  return nil
+ }
+
+ if curr.Next == nil {
+  return curr
+ } else {
+  return getParent(curr.Next)
+ }
+}
+
+func GetNext(pNode *TreeLinkNode) *TreeLinkNode {
+ if pNode == nil {
+  return pNode
+ }
+
+ root := getParent(pNode)
+ var vec []*TreeLinkNode
+
+ var inOrder func(*TreeLinkNode)
+ inOrder = func(root *TreeLinkNode) {
+  if root == nil {
+   return
+  }
+
+  inOrder(root.Left)
+  vec = append(vec, root)
+  inOrder(root.Right)
+ }
+
+ inOrder(root)
+
+ for idx := 0; idx < len(vec); idx++ {
+  if vec[idx] == pNode {
+   if idx == len(vec)-1 {
+    return nil
+   }
+   return vec[idx+1]
+  }
+ }
+
+ return nil
+}
+```
+
+## 单调队列
+
+```cpp
+/**
+ * 单调队列
+ */
+class MonitonicQueue {
+public:
+    void push(int val) {
+    // 剔除较小值，保持队列单调性
+        while(!que_.empty() && que_.back() < val)
+            que_.pop_back();
+        que_.push(val);
+    }
+
+    int max() const { return que_.front(); }
+
+    void pop(int val) {
+        if (val == que_.front())
+            que_.pop_front();
+    }
+
+private:
+    deque<int> que_;
+};
+
+```
+
+### [滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)
+
+给你一个整数数组`nums`，有一个大小为 `k` 的滑动窗口从数组的最左侧移动到数组的最右侧
+
+你只可以看到在滑动窗口内的 `k` 个数字, 滑动窗口每次只向右移动一位。
+
+返回滑动窗口中的最大值
+
+```cpp
+vector<int> maxSildingWindow(vector<int>& nums, int k) {
+    vector<int> res;
+    deque<int> que;
+
+    for (int i = 0; i < nums.size(); ++i) {
+        if (i < k - 1) {
+            while(!que.empty() && nums[i] > nums[que.back()]) 
+                que.pop_back();
+            que.push_back(i);
+        } else {
+            while(!que.empty() && nums[i] > nums[que.back()]) 
+                que.pop_back();
+            que.push_back(i);
+            
+            res.push_back(nums[que.front()]);
+            
+            if (nums[i] == que.front()) que.pop_front();
+        }
+    }
+
+    return res;
+}
+```
+
+## Stack 栈
+
+[用两个栈实现队列](https://www.nowcoder.com/practice/54275ddae22f475981afa2244dd448c6?tpId=265&tqId=39213&rp=1&ru=/exam/oj/ta&qru=/exam/oj/ta&sourceUrl=%2Fexam%2Foj%2Fta%3FtpId%3D13&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+用两个栈来实现一个队列，使用n个元素来完成 n 次在队列尾部插入整数(push)和n次在队列头部删除整数(pop)的功能
+
+队列中的元素为int类型
+
+保证操作合法，即保证pop操作时队列内已有元素
+
+```cpp
+
+```
+
+### [下一个更大元素](https://leetcode.cn/problems/next-greater-element-i/)
+
+```cpp
+vector<int> nextGreaterElement(vector<int>& nums) {
+    size_t n = nums.size();
+    vector<int> res(n);
+    stack<int> stk;
+
+    // 倒着往栈里放
+    for (size_t i = n - 1; i >= 0; --i) {
+        // 判定个子高矮
+        while (!stk.empty() && stk.top() <= nums[i]) {
+            // 矮个起开，反正也被挡着了
+            stk.pop();
+        }
+        // nums[i] 身后的更大元素
+        res[i] = stk.empty() ? -1 : stk.top();
+        stk.push(nums[i]);
+    }
+    return res;
+}
+```
+
+### 环形数组
+
+- **通过 `%` 运算符求模（余数），来模拟环形特效**
+- **数组长度翻倍**
+
+```cpp
+vector<int> nextGreaterElements(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> res(n);
+    stack<int> stk;
+
+    // 倒着往栈里放
+    for (size_t i = 2 * n - 1; i >= 0; --i) {
+        // 判定个子高矮
+        while (!stk.empty() && stk.top() <= nums[i % n]) {
+            // 矮个起开，反正也被挡着了
+            stk.pop();
+        }
+        // nums[i] 身后的更大元素
+        res[i % n] = stk.empty() ? -1 : stk.top();
+        stk.push(nums[i % n]);
+    }
+    return res;
 }
 ```
 
@@ -1018,118 +1497,6 @@ bool canFinish(int num, vector<vector<int>>& prerequisites) {
 ```
 
 **对于加权图的场景，需要使用优先队列『自动排序』特性，将路径权重较小的节点排在队列前面，以此为基础施展 BFS 算法，即 `Dijkstra` 算法**
-
-## 单调队列
-
-```cpp
-/**
- * 单调队列
- */
-class MonitonicQueue {
-public:
-    void push(int val) {
-    // 剔除较小值，保持队列单调性
-        while(!que_.empty() && que_.back() < val)
-            que_.pop_back();
-        que_.push(val);
-    }
-
-    int max() const { return que_.front(); }
-
-    void pop(int val) {
-        if (val == que_.front())
-            que_.pop_front();
-    }
-
-private:
-    deque<int> que_;
-};
-
-```
-
-### [滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)
-
-给你一个整数数组`nums`，有一个大小为 `k` 的滑动窗口从数组的最左侧移动到数组的最右侧
-
-你只可以看到在滑动窗口内的 `k` 个数字, 滑动窗口每次只向右移动一位。
-
-返回滑动窗口中的最大值
-
-```cpp
-vector<int> maxSildingWindow(vector<int>& nums, int k) {
-    vector<int> res;
-    deque<int> que;
-
-    for (int i = 0; i < nums.size(); ++i) {
-        if (i < k - 1) {
-            while(!que.empty() && nums[i] > nums[que.back()]) 
-                que.pop_back();
-            que.push_back(i);
-        } else {
-            while(!que.empty() && nums[i] > nums[que.back()]) 
-                que.pop_back();
-            que.push_back(i);
-            
-            res.push_back(nums[que.front()]);
-            
-            if (nums[i] == que.front()) que.pop_front();
-        }
-    }
-
-    return res;
-}
-```
-
-## 单调栈
-
-### [下一个更大元素](https://leetcode.cn/problems/next-greater-element-i/)
-
-```cpp
-vector<int> nextGreaterElement(vector<int>& nums) {
-    size_t n = nums.size();
-    vector<int> res(n);
-    stack<int> stk;
-
-    // 倒着往栈里放
-    for (size_t i = n - 1; i >= 0; --i) {
-        // 判定个子高矮
-        while (!stk.empty() && stk.top() <= nums[i]) {
-            // 矮个起开，反正也被挡着了
-            stk.pop();
-        }
-        // nums[i] 身后的更大元素
-        res[i] = stk.empty() ? -1 : stk.top();
-        stk.push(nums[i]);
-    }
-    return res;
-}
-```
-
-### 环形数组
-
-- **通过 `%` 运算符求模（余数），来模拟环形特效**
-- **数组长度翻倍**
-
-```cpp
-vector<int> nextGreaterElements(vector<int>& nums) {
-    int n = nums.size();
-    vector<int> res(n);
-    stack<int> stk;
-
-    // 倒着往栈里放
-    for (size_t i = 2 * n - 1; i >= 0; --i) {
-        // 判定个子高矮
-        while (!stk.empty() && stk.top() <= nums[i % n]) {
-            // 矮个起开，反正也被挡着了
-            stk.pop();
-        }
-        // nums[i] 身后的更大元素
-        res[i % n] = stk.empty() ? -1 : stk.top();
-        stk.push(nums[i % n]);
-    }
-    return res;
-}
-```
 
 ## 回溯
 
@@ -1815,7 +2182,7 @@ int maxSubArray(vector<int>& nums) {
 
 给定一个区间的集合`intervals`，其中 `intervals[i] = [starti, endi]`
 
-返回 需要移除区间的最小数量，使剩余区间互不重叠 
+返回 需要移除区间的最小数量，使剩余区间互不重叠
 
 ```cpp
 /* Dynamic Planning: Timeout
@@ -1958,4 +2325,3 @@ int videoStitching(vector<vector<int>>& clips, int time) {
     return -1;
 }
 ```
-
