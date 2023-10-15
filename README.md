@@ -12,3 +12,4 @@
 
 - [秋招刷题笔记](./autumn_code.md)
 
+- [CVScode settings](./settings.json)
