@@ -219,7 +219,7 @@
     ```bash
     yay -S clash-for-windows-bin 
 
-    yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree
+    yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip cajviewer
     
     yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
     ```
@@ -262,7 +262,23 @@
         └── src # 存放 go 源码，不同工程项目的代码以包名区分
         ```
 
-6. 优化
+6. MySQL
+
+很多linux发行版都放弃了对mysql的支持（原因自行百度）转而支持mariadb（mysql的另一个分支），Archlinux就是其中之一，mariadb具有和mysql一模一样的操作命令，所以完全不用考虑迁移兼容的问题
+
+1. 安装mariadb: `sudo pacman -Sy mariadb`
+
+2. 配置mariadb命令，创建数据库都在/var/lib/mysql/目录下面: `sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`
+
+3. 开启mariadb 服务: `systemctl start mariadb`
+
+4. 初始化密码，期间有让你设置密码的选项，设置你自己的密码就行了，然后根据自己理解y/n就可，因为很多后面可以再修改: `sudo /usr/bin/mysql_secure_installation`
+
+5. 登录mariadb 和mysql命令是一样的: `mysql -u root -p`
+
+6. 设置开机自启动服务: `systemctl enable mariadb #开机自启动`
+
+7. 优化
 
     **TRIM**
 
@@ -491,6 +507,24 @@ sudo modprobe vboxdrv
     `sudo grub-mkconfig -o /boot/grub/grub.cfg`
 
 - Choose Kernel From GRUB During Boot
+
+---
+
+### CUDA & cuDNN
+
+```bash
+yay -S cuda-11.7 cudnn8-cuda11.0
+```
+
+Arch Linux 会将 CUDA 相关档案安装至 `/opt/cuda`，有需要的话可以将 CUDA 的 `PATH` 加到 `~/bashrc`，此路径永远指向最新版CUDA
+
+```bash
+# cuda # fish
+set PATH /opt/cuda-11.7/bin $PATH
+set LD_LIBRARY_PATH /opt/cuda-11.7/lib64/ $PATH
+
+pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
+```
 
 ---
 
