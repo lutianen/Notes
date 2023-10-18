@@ -992,53 +992,53 @@ TreeLinkNode* GetNext(TreeLinkNode* pNode) {
 
 ```go
 type TreeLinkNode struct {
- Val   int
- Left  *TreeLinkNode
- Right *TreeLinkNode
- Next  *TreeLinkNode
+    Val   int
+    Left  *TreeLinkNode
+    Right *TreeLinkNode
+    Next  *TreeLinkNode
 }
 
 func getParent(curr *TreeLinkNode) *TreeLinkNode {
- if curr == nil {
-  return nil
- }
+    if curr == nil {
+        return nil
+    }
 
- if curr.Next == nil {
-  return curr
- } else {
-  return getParent(curr.Next)
- }
+    if curr.Next == nil {
+        return curr
+    } else {
+        return getParent(curr.Next)
+    }
 }
 
 func GetNext(pNode *TreeLinkNode) *TreeLinkNode {
- if pNode == nil {
-  return pNode
- }
+    if pNode == nil {
+        return pNode
+    }
 
- root := getParent(pNode)
- var vec []*TreeLinkNode
+    root := getParent(pNode)
+    var vec []*TreeLinkNode
 
- var inOrder func(*TreeLinkNode)
- inOrder = func(root *TreeLinkNode) {
-  if root == nil {
-   return
-  }
+    var inOrder func(*TreeLinkNode)
+    inOrder = func(root *TreeLinkNode) {
+        if root == nil {
+            return
+        }
 
-  inOrder(root.Left)
-  vec = append(vec, root)
-  inOrder(root.Right)
- }
+        inOrder(root.Left)
+        vec = append(vec, root)
+        inOrder(root.Right)
+    }
 
- inOrder(root)
+    inOrder(root)
 
- for idx := 0; idx < len(vec); idx++ {
-  if vec[idx] == pNode {
-   if idx == len(vec)-1 {
-    return nil
-   }
-   return vec[idx+1]
-  }
- }
+    for idx := 0; idx < len(vec); idx++ {
+        if vec[idx] == pNode {
+            if idx == len(vec)-1 {
+                return nil
+            }
+            return vec[idx+1]
+        }
+    }
 
  return nil
 }

@@ -343,3 +343,57 @@ select {
 - select的语法结构有点类似于switch，但又有些不同。select里的case后面并不带判断条件，而是一个信道的操作，不同于switch里的case
 - Golang 的 select 就是监听 IO 操作，当 IO 操作发生时，触发相应的动作每个case语句里必须是一个IO操作，确切的说，应该是一个面向channel的IO操作
 - 如果 `ch1` 或者 `ch2` 信道都阻塞的话，就会立即进入 `default` 分支，并不会阻塞。但是如果没有 `default` 语句，则会阻塞直到某个信道操作成功为止
+
+## Go modules
+
+Go modules 是 Go 语言的依赖解决方案，目前集成在 Go 的工具链中，只要安装了 Go，自然而然可以使用 Go modules；
+
+解决的问题：
+
+- Go 语言长久以来的依赖管理问题；
+- “淘汰” 现有的 GOPATH 的使用模式；
+- 统一社区中的其他的依赖管理工具（提供迁移功能）
+
+### **GO MOD 命令**
+
+- `go mod init`: 初始化当前目录，创建 `go.mod` 文件
+- `go mod tidy`: 增加缺少的模块，删除不用的模块（整理现有依赖）
+- `go mod download`: 下载依赖的 module 到本地 cache（下载依赖）
+- `go mod graph`: 打印模块依赖图，查看现有的依赖结构
+- `go mod edit`: 编辑 go.mod 文件
+- `go mod vendor`: 将依赖复制到 vendor 目录下
+- `go mod verify`: 校验依赖
+- `go mod why`: 解释为什么需要依赖
+
+### **GO111MODULE**
+
+Go 语言通过 `GO111MODULE` 环境变量来控制 Go modules 的开启和关闭，该环境变量有三个值：
+
+- `auto`：默认值，当项目在 `$GOPATH/src` 目录之外且项目根目录有 `go.mod` 文件时开启 Go modules，否则关闭 Go modules
+- `on`：开启 Go modules，【推荐设置】
+- `off`：关闭 Go modules，不使用 Go modules
+
+设置命令：`go env -w GO111MODULE=on`
+
+### **GOPROXY**
+
+主要用于设置 Go 模块代理（Go modules proxy），用于解决 Go modules 下载依赖包的问题，其作用是用于使 Go 在后续拉取模块版本时直接通过代理服务器拉取，而不是通过默认的 `https://proxy.golang.org` 拉取
+
+`GOPROXY` 默认值：`https://proxy.golang.org,direct`
+
+设置命令：`go env -w GOPROXY=https://goproxy.cn,direct`
+
+### **GOSUMDB**
+
+主要用于设置 Go 模块校验和数据库（Go modules checksum database），用于解决 Go modules 下载依赖包的问题，其作用是用于使 Go 在后续拉取模块版本时直接通过校验和数据库校验，而不是通过默认的 `sum.golang.org` 校验
+
+`GOSUMDB` 默认值：`sum.golang.org`
+
+设置命令：`go env -w GOSUMDB=sum.golang.org`
+
+### **GONOPROXY / GOPRIVATE / GONOSUMDB**
+
+主要用于指明某些模块不走代理，或者不走校验和数据库，这些模块可以是私有模块，也可以是公开模块
+
+> NOTE: 只需要设置 `GOPRIVATE` 即可
+> `go env -w GOPRIVATE="*.example.com"`
