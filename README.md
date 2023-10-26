@@ -10,6 +10,9 @@
 
 - [Neovim 相关配置](./neovim.md)
 
+- [CVScode settings](./settings.json)
+
 - [秋招刷题笔记](./autumn_code.md)
 
-- [CVScode settings](./settings.json)
+- [秋招简历模板](./resume_template.pdf)
+
