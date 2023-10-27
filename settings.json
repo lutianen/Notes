@@ -1,16 +1,25 @@
 // This file is used for setting up user preferences and options for VS Code.
 // Plugins:
 //    - C/C++
-//    - CMake
 //    - Clangd
+//    - CMake
 //    - CMake Tools
-//    - Highlight Line
-//    - Vim
 //    - Doxdocgen
+//    - Error Lens
 //    - GitLens
-//    - Todo Tree
-//    - AWS Toolkit
+//    - Go
+//    - Hex Editor
+//    - Highlight Line
+//    - markdownlint
+//    - Path Intellisense
+//    - Pylance
+//    - Python
 //    - Remote - SSH
+//    - Todo Tree
+//    - Vim
+//    - vscode-icons
+//    - vscode-pdf
+//    - AWS Toolkit
 
 {
     "editor.fontSize": 16,
@@ -35,13 +44,21 @@
     "workbench.colorCustomizations": {
         "editorCursor.foreground": "#65EAB9",
         "editor.lineHighlightBackground": "#292e42",
-        "statusBar.background": "#005f5f",
-        "statusBar.noFolderBackground": "#005f5f",
-        "statusBar.debuggingBackground": "#005f5f"
+        "statusBar.background": "#5f00af",
+        "statusBar.noFolderBackground": "#5f00af",
+        "statusBar.debuggingBackground": "#5f00af",
+        "statusBar.foreground": "#ffffff",
+        "statusBar.debuggingForeground": "#ffffff"
     },
+
+    // Golang
+    "go.toolsManagement.autoUpdate": true,
 
     // Highlight line
     "highlightLine.borderWidth": "1px",
+
+    // vscode-icons
+    "vsicons.dontShowNewVersionMessage": true,
 
     // vim
     "vim.leader": "<space>",
@@ -118,7 +135,7 @@
     "vim.visualModeKeyBindings": [
         // 左右缩进、可连续使用
         { "before": [">"], "commands": [ "editor.action.indentLines"] },
-        { "before": [">"], "commands": [ "editor.action.indentLines"] }
+        { "before": ["<"], "commands": [ "editor.action.outdentLines"] }
     ],
 
     // clangd
@@ -227,14 +244,4 @@
     "aws.suppressPrompts": {
         "codeWhispererNewWelcomeMessage": true
     },
-
-    // remote SSH
-    "remote.SSH.remotePlatform": {
-        "MyServer_lutianen": "linux",
-        "VM": "linux",
-        "MyServer_worker1": "linux",
-        "FBS": "linux",
-        "VM_arch": "linux",
-        "172.18.89.147": "linux"
-    }
 }
