@@ -451,6 +451,9 @@ sudo pacman -S virtualbox  # dkms
 sudo pacman -S virtualbox-host-dkms
 sudo dkms autoinstall
 sudo modprobe vboxdrv
+
+sudo pacman -S virtualbox-guest-utils
+sudo systemctl enable vboxservice.service
 ```
 
 ---
@@ -575,3 +578,7 @@ sudo pacman -S openresolv
 3. 优选IP **==warp-yxip==**
 
 ![image-20230722173556110](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221735152.png)
+
+## Games
+
+- sdl-ball: `yay -S sdl-ball`
