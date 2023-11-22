@@ -28,7 +28,7 @@
     "editor.smoothScrolling": true,
     "editor.cursorBlinking": "smooth",
     "editor.cursorSmoothCaretAnimation": "on",
-    "editor.fontFamily": "Source Code Pro",
+    "editor.fontFamily": "Hack Nerd Font Mono",
     "editor.fontLigatures": true,
     "editor.lineNumbers": "relative",
     "editor.wordWrap": "on",
@@ -243,5 +243,5 @@
     
     "aws.suppressPrompts": {
         "codeWhispererNewWelcomeMessage": true
-    },
+    }
 }

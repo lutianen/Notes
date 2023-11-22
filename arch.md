@@ -582,3 +582,15 @@ sudo pacman -S openresolv
 ## Games
 
 - sdl-ball: `yay -S sdl-ball`
+
+## Problems
+
+1. `clear` command - `terminals database is inaccessible`
+
+   解决方案：[Path for Anaconda3 is set in `.bashrc`. It is interfering with the `clear` command. Removing Anaconda path from path solved the issue.](https://github.com/ContinuumIO/anaconda-issues/issues/331)
+
+   > ```bash
+   > ~ ❯❯❯ echo $CONDA_PREFIX                                                                        (base) 
+   > /opt/miniconda
+   > sudo mv $CONDA_PREFIX/bin/clear $CONDA_PREFIX/bin/clear_old
+   > ```
