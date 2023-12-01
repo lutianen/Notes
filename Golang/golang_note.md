@@ -223,7 +223,7 @@ Go语言结构体（Struct）从本质上讲是一种自定义的数据类型，
 
 ### 协程 Coroutines
 
-一种基于线程之上，但又比线程更加轻量级的存在，这种由程序员自己写程序来管理的轻量级线程叫做『用户空间线程』，具有对内核来说不可见的特性。
+一种基于线程之上，但又比线程更加轻量级的存在，这种由程序员自己写程序来管理的轻量级线程叫做『用户空间线程』，具有对内核来说不可见的特性，是 Go 语言程序的并发体。
 
 因为是自主开辟的异步任务，所以很多人也更喜欢叫它们纤程（Fiber），或者绿色线程（GreenThread）。
 
@@ -259,9 +259,7 @@ Go 程序从 main 包的 `main()` 函数开始，在程序启动时，Go 程序�
 
 ### `sync.WaitGroup`
 
-Go 语言中可以使用 `sync.WaitGroup` 来实现并发任务的同步
-
-`sync.WaitGroup` 内部维护着一个计数器，计数器的值可以增加和减少，该计数器的值表示所有**未完成**的并发任务的数量(counter = 0 表示所有并发任务已经完成)
+Go 语言中可以使用 `sync.WaitGroup` 来实现并发任务的同步，内部计数器采用的是*原子变量`atomic.Uint64`*，采用的是 CAS(Compare And Swap) 操作，保证了并发安全性；计数器的值可以增加和减少，该计数器的值表示所有**未完成**的并发任务的数量(counter = 0 表示所有并发任务已经完成)
 
 |      |      |
 | ---- | ---- |
@@ -269,6 +267,14 @@ Go 语言中可以使用 `sync.WaitGroup` 来实现并发任务的同步
 | `(wg *WaitGroup) Add(delta int)` |   counter + delta |
 | `(wg *WaitGroup) Done()` | counter - 1|
 | `(wg *WaitGroup) Wait()` | 阻塞直到计数器为 0 |
+
+NOTE:
+
+- `Add()` 计数器加一，必须在 worker goroutine 开始之前调用，而不是在 goroutine 中调用，否则会导致计数器不准确；
+
+- `Done()` 计数器减一，等价于 `Add(-1)`，可使用 `defer` 来确保计数器即使在出错的情况下依然能够被正确减掉；
+
+> cutdown latch: 倒计时门闩，用于等待多个并发任务执行完成，再执行后续操作，内部计数器表示未完成的并发任务的数量，当计数器的值为 0 时，表示所有并发任务已经完成
 
 ### `GOMAXPROCS`
 
@@ -293,7 +299,7 @@ Go 中使用 `sync` 中的 `Mutex` 类型实现互斥锁
 
 ### channel 管道
 
-`channel`，一个类型管道，通过 `channel` 可以在 goroutine 之间发送和接收消息，是 Galang 在语言层面提供的 goroutine 间的通信方式；
+`channel`，一个类型管道，通过 `channel` 可以在 goroutine 之间发送和接收消息，是 Galang 在语言层面提供的 goroutine 间的通信方式；每个 `channel` 都有一个特殊的类型，也就是 `channel` 可发送数据的类型；
 
 Go 依赖与成为 CSP 的并发模型，通过 Channel 实现这种同步模式；
 
@@ -301,19 +307,26 @@ Golang 并发的核心哲学是：**不要通过共享内存进行通信**
 
 Golang 的 Channel 底层是**环形队列（长度在创建时指定）**实现，在任何时候，同时只能有一个 goroutine 访问通道进行发送数据和获取数据，总是遵循**先入先出 FISO** 的规则，保证收发数据的顺序;
 
+基于 Channel 发送消息有两个重要方面：每个消息都有一个值，该值可以是任何 Go 语言支持的类型；通讯的事实和发生的时刻同样重要，称之为消息事件；
+
+没有办法直接测试一个 Channel 是否被关闭，但接收操作有一个变体形式 `x, ok := <-channel`：它多接收一个结果，多接收的第二个结果是一个布尔值，表示 Channel 是否被关闭；(**不管一个 Channel 是否被关闭，当它没有被引用时，Go 语言垃圾回收器将自动回收**)
+
 基本操作：
 
 > chan 是引用类型，需要使用 `make` 进行创建
 >
-> 无缓冲的 `channel`：`make(chan Type)` 是同步的
+> 无缓冲的 `channel`：`make(chan Type)` 是同步的：一个基于无缓存 Channel 的发送操作将导致发送者 goroutine 阻塞，直至另一个 goroutine 在相同的 Channel 上执行接收操作，当发送的值通过 Channel 成功传输之后，两个 goroutine 才可以继续执行后面的语句.
 >
-> 有缓冲的 `channel`：`make(chan Type, capicity)` 是异步的
+> 有缓冲的 `channel`：`make(chan Type, capicity)` 是异步的: 内部持有一个元素队列，队列的最大容量是在调用 `make()` 创建 `channel` 时通过 `capicity` 参数指定的，如果队列已满，那么发送者 goroutine 将阻塞在 `channel` 上，直到队列中有空闲位置；如果队列为空，那么接收者 goroutine 将阻塞在 `channel` 上，直到队列中有值可读；
 
 注意事项：
 
 - 如果给一个 `nil` 的 `channel` 发送数据，会一直阻塞
+
 - 如果从一个 `nil` 的 `channel` 接收数据，会一直阻塞
+
 - 如果给一个已经关闭的 `channel` 发送数据，会抛出 `panic`
+
 - 如果从一个已经关闭的 `channel` 接收数据，会返回一个零值，不会抛出 `panic`
 
 ```go
@@ -340,6 +353,39 @@ for v := range ch {
 }
 ```
 
+### 串联的 Channels(Pipeline)
+
+Channels 用于将多个 goroutine 连接起来，一个 goroutine 的输出作为下一个 goroutine 的输入，这种串联的 Channels 称为 Pipeline（管道）
+
+### 单方向 Channel
+
+Go 语言中的 Channel 可以设置为单方向的(**在编译期检测**)，即只用于发送或者接收数据，常用于*函数参数*； **单方向 Channel 可以转换为双向 Channel，反之不行**；
+
+- `chan <- Type`: 只用于发送 `Type` 类型数据的 Channel，不能用于接收
+
+- `<- chan Type`: 只用于接收 `Type` 类型数据的 Channel，不能用于发送
+
+> **因为关闭操作只用于断言不再向 Channel 发送新的数据，故只有在发送者所在的 goroutine 才会调用 `close()`, 而接收者不应该关闭接收 Channel(因为无法判断是否还有发送者在发送数据)**
+
+**多个 goroutine 并发地向同一个 channel 发送数据，或从同一个 channel 接收数据都是常见的用法**
+**生产者-消费者模式中，当生产者的生产速度一直快于消费者的消费速度，那么它们之间的缓存大部分时间都将会满的；反之，它们大部分时间都是空的；对于这两类场景，额外的缓存并没有带来任何好处.**
+
+> 实例：某个 Server 并发地向三个镜像站点发出请求，三个站点分散在不同的地理位置，它们分别将收到的响应发送到带缓存 channel,最后接收者只接收第一个收到的响应，即最快的响应；
+> ```go
+> func mirroredQuery() string {
+>     responses := make(chan string, 3)
+>     go func() { responses <- request("asia.gopl.io") }()
+>     go func() { responses <- request("europe.gopl.io") }()
+>     go func() { responses <- request("americas.gopl.io") }()
+>     return <-responses // return the quickest response
+> }
+> ```
+> **如果使用了无缓存的 channel,那么两个慢的 goroutines 将会被永远阻塞，因为没有其他的 goroutine 接收数据，这种情况称为 goroutine 泄漏，这将是一个 BUG (和垃圾变量不同，泄漏的 goroutine 将不会被回收)**
+
+### 并发的循环
+
+像子问题都是完全彼此独立的问题叫做*易并行问题(embarrassingly parallel)*，这种问题最容易被实现成并行的形式，并且最能够享受到并发带来的好处，能够随着并行的规模线性地扩展；
+
 ### `select`
 
 > Go 语言的 `select` 语句借鉴自 Unix 的 `select()` 函数，在 Unix 中，可以通过调用 `select()` 函数来监控一系列的文件句柄，一旦其中一个文件句柄发生了 IO 动作，该 `select()` 调用就会被返回（C 语言中就是这么做的），后来该机制也被用于实现高并发的 Socket 服务器程序。Go 语言直接在语言级别支持 `select` 关键字，用于处理并发编程中通道之间异步 IO 通信问题
@@ -356,7 +402,9 @@ select {
 ```
 
 - select的语法结构有点类似于switch，但又有些不同。select里的case后面并不带判断条件，而是一个信道的操作，不同于switch里的case
+
 - Golang 的 select 就是监听 IO 操作，当 IO 操作发生时，触发相应的动作每个case语句里必须是一个IO操作，确切的说，应该是一个面向channel的IO操作
+
 - 如果 `ch1` 或者 `ch2` 信道都阻塞的话，就会立即进入 `default` 分支，并不会阻塞。但是如果没有 `default` 语句，则会阻塞直到某个信道操作成功为止
 
 ## Go modules
@@ -422,6 +470,129 @@ Go 语言通过 `GO111MODULE` 环境变量来控制 Go modules 的开启和关�
 - 接口的方法调用，也就是一个函数指针的间接调用
 
 > **接口调用是一种动态的计算后的跳转调用，会导致 CPU 缓存失败和分支预测失败**
+
+## 测试 `go test`
+
+`go test` 命令是一个按照一定的约定和组织来测试代码的程序，在包目录内，所有以 `_test.go` 为后缀的源文件在执行 `go build` 时不会被构建成包的一部分，它们是属于 `go test` 测试的一部分；
+
+在 `*_test.go` 文件中有三种类型的函数，测试函数、基准测试(benchmark)函数和示例函数:
+
+- 测试函数：格式为 `func TestXxx(*testing.T)`, 用于测试程序的一些逻辑行为是否正确；`go test` 命令会调用*测试函数*并报告测试结果是 `PASS` 或 `FAIL`；
+
+- 基准测试函数：格式为 `func BenchmarkXxx(*testing.B)`，用于衡量一些函数的性能；`go test` 命令会多次运行基准函数以计算一个平均的执行时间；
+
+- 示例函数：格式为 `func ExampleXxx()`，提供一个由编译器保证正确性的示例文本；`go test` 命令会检查 `// Output:` 后面的文本与示例函数的输出是否一致；
+
+`go test` 命令会遍历所有的 `*_test.go` 文件中符合上述命名规则的函数，生成一个临时的 main 包用于调用相应的测试函数，然后构建并运行、报告测试结果，最后清理测试中生成的临时文件；
+
+> `go test` 命令参数 `-v`：可用于打印每个测试函数的名字和运行时间
+>
+> `go test` 命令参数 `-run`：用于指定运行的测试函数(正则表达式)，例如 `-run Array` 只运行包含 `Array` 的测试函数
+
+### 测试函数 `TestXxx`
+
+函数签名：`func TestXxx(t *testing.T) {...}`，其中 `t` 参数用于报告测试失败和附加的日志信息；
+
+测试失败的信息一般形式：`f(x)=y, want z`，其中 `f(x)=y` 为测试函数的输出，`z` 为期望的输出；
+
+```go
+func TestIsPalindrome(t *testing.T) {
+	// 测试驱动表格
+	var tests = []struct {
+		input string
+		want  bool
+	}{
+		{"", true},
+		{"aba", true},
+		{"été", true},
+		{"Et se resservir, ivresse reste.", true},
+		{"palindrome", false}, // non-palindrome
+        // ...
+	}
+	for _, test := range tests {
+		if rc := IsPalindrome(test.input); rc != test.want {
+			t.Errorf("IsPalindrome(%q) = %v", test.input, rc)
+		}
+	}
+}
+```
+
+### 基准测试函数 `BenchmarkXxx`
+
+基准测试，用来测量一个程序在固定工作负载下的性能，以 `Benchmark` 为前缀名，并且带有一个 `*testing.B` 类型的参数，`*testing.B` 参数提供了一个整数 `N`，用于指定操作执行的循环次数；
+
+- **默认情况下，`go test` 命令不会运行基准测试函数，需要使用 `-bench` 命令行标志参数来指定需要运行的基准测试函数，该参数是一个正则表达式，用于匹配需要运行的基准测试函数名，默认是空**
+
+- **`-benchmem` 命令行标志参数将在报告中包含内存分配 (*快的程序往往是伴随着较少的内存分配*) 的统计数据**
+
+- 比较行的基准测试函数就是普通程序代码，通常是单参数的函数，由几个不同数量级的基准测试函数调用；**要避免直接修改 `b.N` 来控制输入的大小，除非将它作为一个固定大小的迭代计算输入，否则会导致基准测试的结果不准确**
+    
+    ```go
+    func benchmark(b *testing.B, size int) { /*...*/ }
+    func Benchmark10(b *testing.B) { benchmark(b, 10) }
+    func Benchmark100(b *testing.B) { benchmark(b, 100) }
+    func Benchmark1000(b *testing.B) { benchmark(b, 1000) }
+    ```
+
+    > 通过函数参数来指定输入的大小，单参数变量对于每个具体的基准测试都是固定的
+
+- **结果中基准测试名的数字后缀，表示运行时对应的 `GOMAXPROCS` 的值**
+
+```go
+func BenchmarkIsPalindrome(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        IsPalindrome("yumeng");
+    }
+}
+
+// output
+goos: linux
+goarch: amd64
+pkg: github.com/lutianen/gopl/src/testing/word
+cpu: 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+BenchmarkIsPalindrome-16        830218813                1.400 ns/op
+PASS
+ok      github.com/lutianen/gopl/src/testing/word       1.312s
+```
+
+#### 剖析
+
+当我们想仔细观察程序的性能时，最好的方法是性能剖析(profiling). 
+
+**剖析而技术是基于程序运行期间一些自动抽样，然后再收尾时进行推断，最后产生的统计结果就是剖析报告**；
+
+- CPU 剖析标识了最耗 CPU 时间的的函数：在每个 CPU 上运行的线程在每隔几毫秒都会遇到操作系统的中断事件，每次中断时都会记录一个剖析数据，然后恢复正常的运行.
+
+- 堆剖析标识了最耗内存的语句：剖析库会记录调用内部内存分配的操作，平均每 512KB 的内存分配会触发一个剖析数据.
+
+- 阻塞剖析记录阻塞 goroutine 最久的操作：每当 goroutine 被阻塞时（系统调用、管道发送和接收、锁操作等），剖析库都会记录一个剖析数据.
+
+> **剖析数据的收集会带来额外的开销，因此默认情况下是关闭的，需要通过命令行标志参数 `-cpuprofile`、`-memprofile` 和 `-blockprofile` 来开启**
+>
+> NOTE: **当使用多个标志参数时需要当心，因为一项分析操作可能会影响其他项的分析结果**
+> ```bash
+> go test -cpuprofile=cpu.out
+> go test -blockprofile=block.out
+> go test -memprofile=mem.out
+> ```
+
+一旦已经收集到了用于分析的采样数据，就可以使用 `go tool pprof` 来分析这些数据，它是 Go 工具箱自带的一个工具，但并不是一个日常工具。
+
+该命令有许多特性和选项，当时最基本的两个参数是：生成这个概要文件的可执行程序和对应的剖析数据。
+
+但由于分析日志本身并不包含函数的名字，他只包含函数对应的地址，因此 pprof 命令需要对应的可执行程序 (启用分析会将测试程序保存为 XXX.test 文件) 来剖析数据，以便能够将地址转换为函数名；
+
+### 示例函数 `ExampleXxx`
+
+示例函数，以 `Example` 作为函数前缀名，没有参数和返回值，用于展示函数的使用方法.
+
+用处：
+
+- 作为文档：一个包的例子可以更简洁直观的方式来演示函数的用法，比文字描述直接易懂，特别是作为一个提醒或快速参考；
+
+- 作为测试：在执行 `go test` 命令时，示例函数会被编译并执行，如果示例函数的输出结果与注释中的 `Output:` 标记的结果一致，则测试通过，否则测试失败；
+
+- 提供一个正式的演练场
 
 ## Go Convey 单元测试框架
 

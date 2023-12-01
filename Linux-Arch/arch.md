@@ -187,19 +187,19 @@
     pacman -Rns package_name
     pacman -U pacage.tar.zx # 从本地文件安装
     pactree pacage_name # 显示软件的依赖树
-
+    
     yay -S fish
     # curl -L https://get.oh-my.fish | fish 
     fish_config
     # 取消问候语
     set -U fish_greeting ""
-
+    
     sudo vim /etc/systemd/system/clash.service
     sudo systemctl daemon-reload 
     sudo systemctl enable clash 
     sudo systemctl start clash 
     sudo systemctl status clash
-
+    
     sudo pacman -S obs-studio
     ```
 
@@ -207,7 +207,7 @@
 
     ```bash
     sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color fcitx5-pinyin-moegirl fcitx5-pinyin-zhwiki
-
+    
     # sudo vim /etc/environment
     GTK_IM_MODULE=fcitx
     QT_IM_MODULE=fcitx
@@ -218,10 +218,12 @@
 
     ```bash
     yay -S clash-for-windows-bin 
-
+    
     yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk
     
     yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
+    
+    listen1, 
     ```
 
 4. you-get
