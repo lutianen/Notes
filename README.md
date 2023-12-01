@@ -1,4 +1,8 @@
-# Lute's Notes
+# Notes For Myself
+
+## **主要是一些自己的笔记，方便自己查阅，也方便他人参考**
+
+> 下面是一些笔记的链接，点击即可跳转
 
 - [ArchLinux 相关操作](./Linux-Arch/arch.md)
 
