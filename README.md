@@ -12,10 +12,12 @@
 
 - [Compile Qt5 with mingw64](./C++/Compile_Qt5_mingw64.md)
 
-- [Neovim 相关配置](./Vim/neovim.md)
+- [Neovim 相关配置](https://github.com/lutianen/nvim)
 
 - [VSCode settings](./VSCode/settings.json)
 
 - [秋招刷题笔记](./Others/autumn_code.md)
 
 - [秋招简历模板](./Others/resume_template.pdf)
+
+- [面试笔记](./Others/interview_notes.md)
