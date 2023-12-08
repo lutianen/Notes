@@ -1,29 +1,6 @@
-// This file is used for setting up user preferences and options for VS Code.
-// Plugins:
-//    - C/C++
-//    - Clangd
-//    - CMake
-//    - CMake Tools
-//    - Doxdocgen
-//    - Error Lens
-//    - GitLens
-//    - Go
-//    - Hex Editor
-//    - Highlight Line
-//    - markdownlint
-//    - Path Intellisense
-//    - Pylance
-//    - Python
-//    - Remote - SSH
-//    - Todo Tree
-//    - Vim
-//    - vscode-icons
-//    - vscode-pdf
-//    - AWS Toolkit
-
 {
-    "editor.fontSize": 16,
-    "editor.tabSize": 2,
+    // -----------------------------------------------------------------
+    "editor.fontSize": 19,
     "editor.inlineSuggest.enabled": true,
     "editor.smoothScrolling": true,
     "editor.cursorBlinking": "smooth",
@@ -31,37 +8,40 @@
     "editor.fontFamily": "Hack Nerd Font Mono",
     "editor.fontLigatures": true,
     "editor.lineNumbers": "relative",
+    "editor.guides.bracketPairs": "active",
     "editor.wordWrap": "on",
-    "editor.minimap.autohide": true,
     "editor.minimap.enabled": true,
-    "window.zoomLevel": 1.2,
+
+    "window.zoomLevel": 2,
     "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
+
     "workbench.iconTheme": "vscode-icons",
+    "workbench.colorTheme": "Dracula",
     "workbench.list.smoothScrolling": true,
-    "terminal.integrated.enableMultiLinePasteWarning": false,
-    "terminal.integrated.defaultProfile.linux": "fish",
-    "terminal.integrated.smoothScrolling": true,
     "workbench.colorCustomizations": {
         "editorCursor.foreground": "#65EAB9",
-        "editor.lineHighlightBackground": "#292e42",
-        "statusBar.background": "#5f00af",
-        "statusBar.noFolderBackground": "#5f00af",
-        "statusBar.debuggingBackground": "#5f00af",
+        "statusBar.background": "#005f87",
+        "statusBar.noFolderBackground": "#005f87",
+        "statusBar.debuggingBackground": "#005f87",
         "statusBar.foreground": "#ffffff",
         "statusBar.debuggingForeground": "#ffffff"
     },
 
-    // Golang
-    "go.toolsManagement.autoUpdate": true,
+    "terminal.integrated.enableMultiLinePasteWarning": false,
+    "terminal.integrated.defaultProfile.linux": "fish",
+    "terminal.integrated.smoothScrolling": true,
+    "terminal.integrated.inheritEnv": false,
 
+    "diffEditor.ignoreTrimWhitespace": false,
+
+    // -----------------------------------------------------------------
     // Highlight line
-    "highlightLine.borderWidth": "1px",
+    "highlightLine.borderWidth": "2px",
 
-    // vscode-icons
-    "vsicons.dontShowNewVersionMessage": true,
-
-    // vim
-    "vim.leader": "<space>",
+    // -----------------------------------------------------------------
+    // Vim
+    "extensions.experimental.affinity": { "vscodevim.vim": 1 }, // To improve performance
+    "vim.leader": "<space>", // leader - prefix key
     "vim.useSystemClipboard": true,
     "vim.ignorecase": true,
     "vim.smartcase": true,
@@ -70,22 +50,20 @@
     "vim.easymotion": true,
     "vim.easymotionMarkerForegroundColorOneChar": "#ef5452",
     "vim.statusBarColorControl": true,
+
     "vim.handleKeys": {
         "<C-d>": true, // 向下滚动半页
         "<C-f>": true, // 向下滚动一页
         "<C-e>": true, // 向下滚动一行
-        "<C-s>": true, // 
+        "<C-s>": true,
         "<C-z>": false,
-        "<C-a>": true, // 将光标所在位置的数字递增1
+        "<C-a>": true,
         "<C-c>": true,
         "<C-v>": true,
-        "<C-x>": true // 将光标所在位置的数字递减 1
+        "<C-x>": true,
     },
 
-    // 把esc键映射为kj，意思是在插入模式下，按下连续按下 k j 会回到正常模式
-    "vim.insertModeKeyBindings": [
-        { "before": ["j", "k"], "after": ["<Esc>"] }
-    ],
+    "vim.insertModeKeyBindings": [{ "before": ["j", "k"], "after": ["<Esc>"] }, ],
 
     "vim.normalModeKeyBindings": [
         // 变量重命名
@@ -100,28 +78,6 @@
         { "before": ["leader","h"], "commands": [":tabprevious"] },
         // 侧边栏：显示与隐藏 <leader>ef
         { "before": ["leader", "e", "f"], "commands": [{"command": "workbench.action.toggleSidebarVisibility"}] },
-        // cmake run(cmr): cmake 编译并运行
-        {  "before": ["leader", "c", "m", "r"],
-            "commands": [
-                {
-                    "command": "workbench.action.terminal.sendSequence",
-                    "args": {
-                        "text": "clear \u000D"
-                    }
-                },
-                { "command": "cmake.launchTarget"}]
-        },
-        // cmake build(cmb): cmake 编译
-        { "before": ["leader", "c", "m", "b"],
-            "commands": [
-                {
-                    "command": "workbench.action.terminal.sendSequence",
-                    "args": {
-                        "text": "clear \u000D"
-                    }
-                },
-                { "command": "cmake.build"}]
-        },
         { // 快速搜索打开文件
             "before": ["leader", "g", "g"],
             "commands": [{ "command": "workbench.action.quickOpen" }]
@@ -129,64 +85,70 @@
         { // 快速搜索: 本项目中的文件
             "before": ["leader", "g", "f"],
             "commands": [{ "command": "workbench.view.search" }]
-        }
+        },
+
+        // cmake run(cmr): cmake 编译并运行
+        {  "before": ["leader", "c", "m", "r"],
+            "commands": [{
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {"text": "clear \u000D"}
+                }, { "command": "cmake.launchTarget"}]
+        },
+        // cmake build(cmb): cmake 编译
+        { "before": ["leader", "c", "m", "b"],
+            "commands": [{
+                    "command": "workbench.action.terminal.sendSequence",
+                    "args": {"text": "clear \u000D"}
+                }, { "command": "cmake.build"}]
+        },
     ],
 
     "vim.visualModeKeyBindings": [
         // 左右缩进、可连续使用
         { "before": [">"], "commands": [ "editor.action.indentLines"] },
-        { "before": ["<"], "commands": [ "editor.action.outdentLines"] }
+        { "before": ["<"], "commands": [ "editor.action.outdentLines"] },
     ],
-
-    // clangd
-    "C_Cpp.intelliSenseEngine": "disabled",
-    "clangd.onConfigChanged": "restart",
-    "clangd.path": "/bin/clangd",
-    "clangd.arguments": [
-        "--compile-commands-dir=${workspaceFolder}/build",
-        "--header-insertion=never"
-    ],
-    "[c]": {
-        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
-    },
-    "[cpp]": {
-        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
-    },
-
-    // doxdocgen
-    "doxdocgen.file.copyrightTag": [
-        "@copyright Copyright (c) {year}",
-        "FOR STUDY AND RESEARCH SUPPORT ONLY"
-    ],
-    "doxdocgen.file.fileOrder": [
-        "copyright", 
-        "empty", 
-        "file", "brief", "author",
-        "empty"
-    ],
-    "doxdocgen.generic.authorEmail": "",
-    "doxdocgen.generic.authorName": "Tian-en Lu",
-    "doxdocgen.generic.authorTag": "@author https://github.com/lutianen",
-    "doxdocgen.generic.order": [
-        "brief",
-        "param",
-        "return"
-    ],
-    "doxdocgen.generic.paramTemplate": "@param[in] {indent:8}{param} {indent:8} Comment",
-    "doxdocgen.generic.returnTemplate": "@return ",
 
     // -----------------------------------------------------------------
-    // CMake
-    "cmake.configureOnOpen": true,
-    "cmake.generator": "Ninja",
-    "cmake.parallelJobs": 0,
+    // Markdown
+    "markdown.extension.print.absoluteImgPath": false,
+    "markdown.extension.preview.autoShowPreviewToSide": true,
+    "markdown.extension.toc.orderedList": true,
 
-    // gitlens
-    "gitlens.hovers.currentLine.over": "line",
-    "gitlens.codeLens.enabled": false,
+    // -----------------------------------------------------------------
+    // Gitlens
     "gitlens.graph.layout": "editor",
-    "gitlens.graph.minimap.enabled": false,
+    "gitlens.hovers.currentLine.over": "line",
     "gitlens.ai.experimental.openai.model": "gpt-3.5-turbo-16k",
+    "gitlens.codeLens.enabled": false,
+    "gitlens.hovers.annotations.enabled": false,
+    "gitlens.changes.locations": [
+        "gutter",
+        "line",
+        "overview"
+    ],
+    "gitlens.heatmap.locations": [
+        "gutter",
+        "overview",
+        "line"
+    ],
+
+    // -----------------------------------------------------------------
+    // Golang
+    "gopls": {
+        "ui.semanticTokens": true
+    },
+
+    // -----------------------------------------------------------------
+    // remote SSH
+    "remote.SSH.remotePlatform": {
+        "MyServer_lutianen": "linux",
+        "VM": "linux",
+        "MyServer_worker1": "linux",
+        "FBS": "linux",
+        "VM_arch": "linux",
+        "172.18.89.147": "linux",
+    },
 
     // -----------------------------------------------------------------
     // todo-tree settings
@@ -198,9 +160,9 @@
         "TODO", // 代表未完成事项
         "FIXME", // 代表需要修复的事项
         "NOTE", // 添加一些说明文字
-        "TAG", // TAG
+        "TAG", // TAG      
         "BUG", // 代表必须修复的 BUG
-        "XXX" // 代表标识处代码虽然实现了功能，但是实现的方法有待商榷，希望将来能改进
+        "XXX", // 代表标识处代码虽然实现了功能，但是实现的方法有待商榷，希望将来能改进
     ],
     "todo-tree.highlights.defaultHighlight": {
         "icon": "fold",
@@ -209,20 +171,20 @@
         "rulerLane": "right",
         "foreground": "#ffffff",
         "background": "#2e5e18",
-        "iconColour": "#38ad01"
+        "iconColour": "#38ad01",
     },
     "todo-tree.highlights.customHighlight": {
         "FIXME": {
             "icon": "flame",
             "foreground": "#000000",
             "background": "#FF0000",
-            "iconColour": "#FF0000"
+            "iconColour": "#FF0000",
         },
         "BUG": {
             "icon": "bug",
             "foreground": "#000000",
             "background": "#00FF00",
-            "iconColour": "#00FF00"
+            "iconColour": "#00FF00",
         },
         "TAG": {
             "icon": "tag",
@@ -238,10 +200,65 @@
             "icon": "beaker",
             "background": "#FFA500",
             "iconColour": "#FFA500"
-        }
+        },
     },
     
+    // -----------------------------------------------------------------
+    // Code Whisperer
     "aws.suppressPrompts": {
         "codeWhispererNewWelcomeMessage": true
-    }
+    },
+
+    // -----------------------------------------------------------------
+    // Copilot
+    "github.copilot.enable": {
+        "*": true,
+        "markdown": true
+    },
+
+    // -----------------------------------------------------------------
+    // Clangd
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "clangd.onConfigChanged": "restart",
+    "clangd.path": "/bin/clangd",
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/build",
+        "--header-insertion=never"
+    ],
+    "[c]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+
+    // -----------------------------------------------------------------
+    // Doxdocgen
+    "doxdocgen.file.copyrightTag": [
+        "@copyright Copyright (c) {year}",
+        "FOR STUDY AND RESEARCH SUPPORT ONLY",
+    ],
+    "doxdocgen.file.fileOrder": [
+        "copyright", 
+        "empty", 
+        "file", "brief", "author",
+        "empty", 
+    ],
+    "doxdocgen.generic.authorEmail": "",
+    "doxdocgen.generic.authorName": "Tian-en Lu",
+    "doxdocgen.generic.authorTag": "@author https://github.com/lutianen",
+    "doxdocgen.generic.order": [
+        "brief",
+        "param",
+        "return",
+    ],
+    "doxdocgen.generic.paramTemplate": "@param[in] {indent:8}{param} {indent:8} Comment",
+    "doxdocgen.generic.returnTemplate": "@return ",
+
+    // -----------------------------------------------------------------
+    // CMake
+    "cmake.showOptionsMovedNotification": false,
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "Ninja",
+    "cmake.parallelJobs": 0,
 }
