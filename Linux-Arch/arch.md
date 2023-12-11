@@ -1,6 +1,6 @@
 # Arch Linux Manu
 
-### Install Arch
+## Install Arch
 
 1. Download Arch Linux ISO
 
@@ -149,151 +149,117 @@
     reboot
     ```
 
-### Software
+---
 
-1. Check NetworkManager
+## 内核更换
 
-    ```bash
-    ping baidu.com
-    systemctl enable NetworkManager
-    ```
+- Install The Desired Kernel
 
-2. pacman 镜像修改
+    `sudo pacman -S linux-lts linux-lts-headers`
 
-    ```bash
-    sudo vim /etc/pacman.conf
-    ----------------
-    # Misc options
-    Color
-    ParallelDownloads = 5
-    ---
-    [multilib]
-    Include = /etc/pacman.d/mirrorlist
-    ---
-    键入：
-    [archlinuxcn]
-    Server = https://mirrors.utsc.edu.cn/archlinuxcn/$arch
-    ---
-
-    sudo pacman -Syyu
-    sudo pacman -S archlinuxcn-keyring
-    ```
-
-3. postInstall
+- Editing GRUB Config File
 
     ```bash
-    sudo pacman -S yay
-    pacman -Sc # 清除软件缓存，即/var/cache/pacman/pkg目录下的文件
-    pacman -Rns package_name
-    pacman -U pacage.tar.zx # 从本地文件安装
-    pactree pacage_name # 显示软件的依赖树
-    
-    yay -S fish
-    # curl -L https://get.oh-my.fish | fish 
-    fish_config
-    # 取消问候语
-    set -U fish_greeting ""
-    
-    sudo vim /etc/systemd/system/clash.service
-    sudo systemctl daemon-reload 
-    sudo systemctl enable clash 
-    sudo systemctl start clash 
-    sudo systemctl status clash
-    
-    sudo pacman -S obs-studio
+    sudo vim /etc/default/grub
+
+    # ---
+    `GRUB_DISABLE_SUBMENU=y`    # disables the GRUB submenu, i.e., it enables all the available kernels to be listed on the main GRUB Menu itself instead of the “Advanced option for Arch Linux” option.
+    `GRUB_DEFAULT=saved` # saves the last kernel used
+    `GRUB_SAVEDEFAULT=true` # makes sure that grub uses the last selected kernel is used as default
     ```
 
-    [Inputs](https://wiki.archlinuxcn.org/wiki/Fcitx5)
+- Re-Generate GRUB Configuration file
 
-    ```bash
-    sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color fcitx5-pinyin-moegirl fcitx5-pinyin-zhwiki
-    
-    # sudo vim /etc/environment
-    GTK_IM_MODULE=fcitx
-    QT_IM_MODULE=fcitx
-    XMODIFIERS=\@im=fcitx
-    # 为了让一些使用特定版本 SDL2 库的游戏能正常使用输入法
-    SDL_IM_MODULE=fcitx
-    ```
+    `sudo grub-mkconfig -o /boot/grub/grub.cfg`
 
-    ```bash
-    yay -S clash-for-windows-bin 
-    
-    yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk
-    
-    yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
-    
-    listen1, 
-    ```
-
-4. you-get
-
-    命令行程序，提供便利的方式来下载网络上的媒体信息。
-
-    ```bash
-    yay -S you-get
-    ```
-
-    - 下载流行网站之音视频，例如YouTube, Youku, Niconico,以及更多
-    - 于您心仪的媒体播放器中观看在线视频，脱离浏览器与广告
-    - 下载您喜欢的网页上的图片
-    - 下载任何非HTML内容，例如二进制文件
-
-5. Golang
-
-    ```bash
-    # Download and install go
-    sudo pacman -S go
-
-    # Set environment variable in `.config/fish/config.sh` or `/etc/profile` or `~/.profile`
-    GOROOT /usr/lib/go
-    GOPATH /home/tianen/goProj
-    GOBIN /home/tianen/goProj/bin
-    PATH $GOPATH/bin $GOROOT/bin $GOBIN $PATH
-    ```
-
-    - **`GOROOT`，设置 Golang 的安装位置**
-    - **`GOBIN`，执行 `go install` 后生成可执行文件的目录**
-    - **`GOPATH`，工作目录，一般设置到用户目录下**
-
-        ```bash
-        # Go 工作目录结构
-        ├── bin  # 存放 `go install` 命令生成的可执行文件，且可把 `$GOBIN` 路径加入到 `PATH` 环境变量中，这样就可以直接在终端中使用 go 开发生成的程序
-        ├── pkg # 存放 go 编译生成的文件
-        ├── readme.md
-        └── src # 存放 go 源码，不同工程项目的代码以包名区分
-        ```
-
-6. MySQL
-
-很多linux发行版都放弃了对mysql的支持（原因自行百度）转而支持mariadb（mysql的另一个分支），Archlinux就是其中之一，mariadb具有和mysql一模一样的操作命令，所以完全不用考虑迁移兼容的问题
-
-1. 安装mariadb: `sudo pacman -Sy mariadb`
-
-2. 配置mariadb命令，创建数据库都在/var/lib/mysql/目录下面: `sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`
-
-3. 开启mariadb 服务: `systemctl start mariadb`
-
-4. 初始化密码，期间有让你设置密码的选项，设置你自己的密码就行了，然后根据自己理解y/n就可，因为很多后面可以再修改: `sudo /usr/bin/mysql_secure_installation`
-
-5. 登录mariadb 和mysql命令是一样的: `mysql -u root -p`
-
-6. 设置开机自启动服务: `systemctl enable mariadb #开机自启动`
-
-7. 优化
-
-    **TRIM**
-
-    TRIM会帮助清理SSD中的块，从而延长SSD的使用寿命
-
-    ```bash
-    sudo systemctl enable fstrim.timer
-    sudo systemctl start fstrim.timer
-    ```
+- Choose Kernel From GRUB During Boot
 
 ---
 
-### git
+## Software
+
+### Check NetworkManager
+
+```bash
+ping baidu.com
+systemctl enable NetworkManager
+```
+
+---
+
+### pacman 镜像修改
+
+```bash
+sudo vim /etc/pacman.conf
+# ----------------
+# Misc options
+Color
+ParallelDownloads = 5
+# ---
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+#---
+键入：
+[archlinuxcn]
+Server = https://mirrors.utsc.edu.cn/archlinuxcn/$arch
+#---
+
+sudo pacman -Syyu
+sudo pacman -S archlinuxcn-keyring
+```
+
+---
+
+### 常见通用软件
+
+```bash
+sudo pacman -S yay
+pacman -Sc # 清除软件缓存，即/var/cache/pacman/pkg目录下的文件
+pacman -Rns package_name
+pacman -U pacage.tar.zx # 从本地文件安装
+pactree pacage_name # 显示软件的依赖树
+
+yay -S fish
+# curl -L https://get.oh-my.fish | fish 
+fish_config
+# 取消问候语
+set -U fish_greeting ""
+
+sudo vim /etc/systemd/system/clash.service
+sudo systemctl daemon-reload 
+sudo systemctl enable clash 
+sudo systemctl start clash 
+sudo systemctl status clash
+
+sudo pacman -S obs-studio
+```
+
+#### [输入法](https://wiki.archlinuxcn.org/wiki/Fcitx5)
+
+```bash
+sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color fcitx5-pinyin-moegirl fcitx5-pinyin-zhwiki
+
+# sudo vim /etc/environment
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=\@im=fcitx
+# 为了让一些使用特定版本 SDL2 库的游戏能正常使用输入法
+SDL_IM_MODULE=fcitx
+```
+
+```bash
+yay -S clash-for-windows-bin 
+
+yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk
+
+yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
+
+listen1, 
+```
+
+---
+
+### Git
 
 #### 配置git
 
@@ -350,7 +316,69 @@
 >      - *由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来
 >      - *在以后的推送或者拉取时就可以简化命令*
 
-### **挂载其他硬盘分区**
+---
+
+### Golang
+
+```bash
+# Download and install go
+sudo pacman -S go
+
+# Set environment variable in `.config/fish/config.sh` or `/etc/profile` or `~/.profile`
+GOROOT /usr/lib/go
+GOPATH /home/tianen/goProj
+GOBIN /home/tianen/goProj/bin
+PATH $GOPATH/bin $GOROOT/bin $GOBIN $PATH
+```
+
+- **`GOROOT`，设置 Golang 的安装位置**
+- **`GOBIN`，执行 `go install` 后生成可执行文件的目录**
+- **`GOPATH`，工作目录，一般设置到用户目录下**
+
+    ```bash
+    # Go 工作目录结构
+    ├── bin  # 存放 `go install` 命令生成的可执行文件，且可把 `$GOBIN` 路径加入到 `PATH` 环境变量中，这样就可以直接在终端中使用 go 开发生成的程序
+    ├── pkg # 存放 go 编译生成的文件
+    ├── readme.md
+    └── src # 存放 go 源码，不同工程项目的代码以包名区分
+    ```
+
+---
+
+### MySQL
+
+很多linux发行版都放弃了对mysql的支持（原因自行百度）转而支持mariadb（mysql的另一个分支），Archlinux就是其中之一，mariadb具有和mysql一模一样的操作命令，所以完全不用考虑迁移兼容的问题
+
+- 安装mariadb: `sudo pacman -Sy mariadb`
+
+- 配置mariadb命令，创建数据库都在/var/lib/mysql/目录下面: `sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`
+
+- 开启mariadb 服务: `systemctl start mariadb`
+
+- 初始化密码，期间有让你设置密码的选项，设置你自己的密码就行了，然后根据自己理解y/n就可，因为很多后面可以再修改: `sudo /usr/bin/mysql_secure_installation`
+
+- 登录mariadb 和mysql命令是一样的: `mysql -u root -p`
+
+- 设置开机自启动服务: `systemctl enable mariadb #开机自启动`
+
+---
+
+### you-get
+
+命令行程序，提供便利的方式来下载网络上的媒体信息。
+
+```bash
+yay -S you-get
+```
+
+- 下载流行网站之音视频，例如YouTube, Youku, Niconico,以及更多
+- 于您心仪的媒体播放器中观看在线视频，脱离浏览器与广告
+- 下载您喜欢的网页上的图片
+- 下载任何非HTML内容，例如二进制文件
+
+---
+
+### 挂载其他硬盘分区
 
 ```bash
 # Get UUID and TYPE
@@ -376,16 +404,18 @@ UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
 
 ### Present Windows
 
-<img src="https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/202309141103383.png" alt="image-20230914110307330" style="zoom:67%;" />
+![Present Windows](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/202309141103383.png)
 
-### scp
+---
 
-**文件上传、下载**
+### `scp` 文件上传、下载
 
-- 上传 `scp .\cifar-10-python.tar.gz lutianen@10.170.46.236:/home/lutianen/`
-- 下载  `scp root@100.100.100.100:/var/tmp/a.txt /var`
+- 上传 `scp .\cifar-10-python.tar.gz lutianen@10.xxx.xxx.xxx:/home/lutianen/`
+- 下载  `scp root@10.xxx.xxx.xxx:/var/tmp/a.txt /var`
 
-### picgo 配置
+---
+
+### picgo
 
 #### picgo-core 【Recommend】
 
@@ -423,25 +453,21 @@ UUID=111915F1111915F1 /home/tianen/doc ntfs3 defaults 0 0
 
 #### picgo app 【Not Recommend】
 
-**安装 picgo**
+1. **安装 picgo**: `yay -S picgo`
 
-```bash
-yay -S picgo
-```
+2. **picgo 配置 github**
 
-**picgo 配置 github**
+    - github 获取 **token**: 见 **picgo-core** 配置
 
-- github 获取 **token**
+    - PicGo 配置
 
-- PicGo 配置
+        ![image-20230912222947951](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/image-20230912222947951.png)
 
-  ![image-20230912222947951](https://cdn.jsdelivr.net/gh/lutianen/PicBed@master/image-20230912222947951.png)
-
-  - 设定仓库名：上文在 GitHub 创建的仓库 `lutianen/PicBed`
-  - 设定分支名：`master`
-  - 设定 Token：上文生成的 token
-  - 指定存储路径：为空的话会上传到跟目录，也可以指定路径
-  - 设定自定义域名：可以为空，这里为了使用 CDN 加快图片的访问速度，按这样格式填写：[https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master](https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master)
+        - 设定仓库名：上文在 GitHub 创建的仓库 `lutianen/PicBed`
+        - 设定分支名：`master`
+        - 设定 Token：上文生成的 token
+        - 指定存储路径：为空的话会上传到跟目录，也可以指定路径
+        - 设定自定义域名：可以为空，这里为了使用 CDN 加快图片的访问速度，按这样格式填写：[https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master](https://cdn.jsdelivr.net/gh/lutianen/PicBed/@master)
 
 ---
 
@@ -457,61 +483,6 @@ sudo modprobe vboxdrv
 sudo pacman -S virtualbox-guest-utils
 sudo systemctl enable vboxservice.service
 ```
-
----
-
-### **SWAP 设置**
-
-<https://wiki.archlinux.org/title/Swap#Swappiness>
-
-- 查看 swap 使用率，一般是 60 ，意思是 60% 的概率将内存整理到 swap
-
-    ```bash
-    cat /proc/sys/vm/swappiness
-    ```
-
-- 修改 swap 使用策略为 10%，即 10% 的概率将内存整理到 swap
-
-    ```bash
-    sudo sysctl -w vm.swappiness=10
-    ```
-
-- 修改配置文件：`sudo vim /etc/sysctl.d/99-swappiness.conf` 在文件末尾加上下面这行内容：`vm.swappiness=10`
-
-- 重启后可查看 swappiness 的值
-
-    ![image-20230723115427188](https://raw.githubusercontent.com/lutianen/PicBed/master/202307231154321.png)
-
----
-
-**Systemd journal size limit**
-
-控制日志最大可使用多少磁盘空间，修改`/etc/systemd/journald.conf` 中的`SystemMaxUse`参数 `SystemMaxUse=50M`
-
----
-
-### **内核更换**
-
-- Install The Desired Kernel
-
-    `sudo pacman -S linux-lts linux-lts-headers`
-
-- Editing GRUB Config File
-
-    ```bash
-    sudo vim /etc/default/grub
-
-    # ---
-    `GRUB_DISABLE_SUBMENU=y`    # disables the GRUB submenu, i.e., it enables all the available kernels to be listed on the main GRUB Menu itself instead of the “Advanced option for Arch Linux” option.
-    `GRUB_DEFAULT=saved` # saves the last kernel used
-    `GRUB_SAVEDEFAULT=true` # makes sure that grub uses the last selected kernel is used as default
-    ```
-
-- Re-Generate GRUB Configuration file
-
-    `sudo grub-mkconfig -o /boot/grub/grub.cfg`
-
-- Choose Kernel From GRUB During Boot
 
 ---
 
@@ -533,7 +504,7 @@ pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --e
 
 ---
 
-### **wireguard**
+### wireguard
 
 ```bash
 # Install wg
@@ -544,7 +515,7 @@ sudo wg-quick up wg0
 sudo wg-quick down wg0
 ```
 
-**wg0.conf**
+#### wg0.conf
 
 `/etc/wireguard/wg0.conf`
 
@@ -562,7 +533,7 @@ AllowedIPs = ::/0
 Endpoint = xxx.xxx.xxx.xxx
 ```
 
-**==配置步骤如下：==**
+#### 配置步骤如下
 
 ```bash
 # Error: /usr/bin/wg-quick: line 32: resolvconf: command not found
@@ -573,13 +544,50 @@ sudo pacman -S openresolv
 
 ![image-20230722173251745](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221732768.png)
 
-2. 配置文件生成：<https://replit.com/@misaka-blog/wgcf-profile-generator?v=1>
+2.配置文件生成：<https://replit.com/@misaka-blog/wgcf-profile-generator?v=1>
 
 ![image-20230722173030527](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221730585.png)
 
-3. 优选IP **==warp-yxip==**
+3.优选IP **==warp-yxip==**
 
 ![image-20230722173556110](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221735152.png)
+
+---
+
+## System optimization
+
+### SSD 优化
+
+**TRIM**, 会帮助清理SSD中的块，从而延长SSD的使用寿命
+
+```bash
+sudo systemctl enable fstrim.timer
+sudo systemctl start fstrim.timer
+```
+
+---
+
+### SWAP 设置
+
+<https://wiki.archlinux.org/title/Swap#Swappiness>
+
+- 查看 swap 使用率，一般是 60 ，意思是 60% 的概率将内存整理到 swap: `cat /proc/sys/vm/swappiness`
+
+- 修改 swap 使用策略为 10%，即 10% 的概率将内存整理到 swap: `sudo sysctl -w vm.swappiness=10`
+
+- 修改配置文件：`sudo vim /etc/sysctl.d/99-swappiness.conf` 在文件末尾加上下面这行内容：`vm.swappiness=10`
+
+- 重启后可查看 swappiness 的值
+
+    ![image-20230723115427188](https://raw.githubusercontent.com/lutianen/PicBed/master/202307231154321.png)
+
+---
+
+### Systemd journal size limit
+
+控制日志最大可使用多少磁盘空间，修改`/etc/systemd/journald.conf` 中的`SystemMaxUse`参数 `SystemMaxUse=50M`
+
+---
 
 ## Games
 
@@ -592,7 +600,11 @@ sudo pacman -S openresolv
    解决方案：[Path for Anaconda3 is set in `.bashrc`. It is interfering with the `clear` command. Removing Anaconda path from path solved the issue.](https://github.com/ContinuumIO/anaconda-issues/issues/331)
 
    > ```bash
-   > ~ ❯❯❯ echo $CONDA_PREFIX                                                                        (base) 
+   > ~  echo $CONDA_PREFIX                                       (base) 
    > /opt/miniconda
    > sudo mv $CONDA_PREFIX/bin/clear $CONDA_PREFIX/bin/clear_old
    > ```
+
+2. `tput: unknown terminal "xterm-256color"`
+
+   解决方案：`setenv TERMINFO /usr/lib/terminfo`
