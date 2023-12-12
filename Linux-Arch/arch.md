@@ -64,7 +64,7 @@
 6. 安装基础包
 
     ```bash
-    pacstrap /mnt bash base base-devel linux-lts  linux-headers linux-firmware neovim xsel
+    pacstrap /mnt bash base base-devel linux linux-headers linux-firmware neovim xsel
 
     // fstab
     genfstab -U -p /mnt >> /mnt/etc/fstab
@@ -139,7 +139,7 @@
     su - tianen
     
     # KDE
-    sudo pacman -S plasma xorg nvidia-lts dolphin konsole fish noto-fonts-cjk noto-fonts-emoji
+    sudo pacman -S plasma xorg nvidia dolphin konsole fish noto-fonts-cjk noto-fonts-emoji
     sudo systemctl enable sddm
     
     # reboot
