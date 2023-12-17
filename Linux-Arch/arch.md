@@ -250,12 +250,13 @@ SDL_IM_MODULE=fcitx
 ```bash
 yay -S clash-for-windows-bin 
 
-yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk
+yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk gpick speedcrunch
 
 yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
-
-listen1, 
 ```
+
+- **gpick**: 可以从桌面任何地方取色，并且它还提供一些其它的高级特性
+- **SpeedCrunch**: 一个漂亮，开源，高精度的科学计算器
 
 ---
 
