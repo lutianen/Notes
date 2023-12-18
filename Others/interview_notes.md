@@ -578,16 +578,16 @@ int main(int argc, char* argv[]) {
    >   ssize_t Buffer::readFd(int fd, int* savedErrno) {
    >       // saved an ioctl()/FIONREAD call to tell how much to read
    >       char extrabuf[65536];
-   >                                                                   
+   >                                                                     
    >       // Prepare iovecs
    >       struct iovec vec[2];
    >       const size_t writeable = writableBytes();
    >       vec[0].iov_base = begin() + writerIndex_;
    >       vec[0].iov_len = writeable;
-   >                                                                   
+   >                                                                     
    >       vec[1].iov_base = extrabuf;
    >       vec[1].iov_len = sizeof(extrabuf);
-   >                                                                   
+   >                                                                     
    >       /// When there is enough space in this buff, don't read into extrabuf
    >       /// When extrabuf is used, we read 128k-1 bytes at most.
    >       const int iovcnt = (writeable < sizeof(extrabuf)) ? 2 : 1;
@@ -600,7 +600,7 @@ int main(int argc, char* argv[]) {
    >           writerIndex_ = buffer_.size();
    >           append(extrabuf, static_cast<size_t>(n) - writeable);
    >       }
-   >                                                                   
+   >                                                                     
    >       return n;
    >   }
    >   ```
@@ -5439,3 +5439,7 @@ target_link_library(main PUBLIC Lute)
     tcpdump -i any 'tcp src port 5883 or udp port 5883'
     tcpdump -i any 'src host 127.0.0.1 and tcp src port 5883' -XX -nn -vv
     ```
+
+#### `killall`
+
+`killall` 命令是一个 Unix 命令行工具，可以用给定的进程名来杀掉所有名字匹配的进程；
