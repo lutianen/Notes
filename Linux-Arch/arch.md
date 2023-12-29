@@ -250,13 +250,35 @@ SDL_IM_MODULE=fcitx
 ```bash
 yay -S clash-for-windows-bin 
 
-yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop libreoffice-still libreoffice-still-zh-cn gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk gpick speedcrunch
+yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk gpick speedcrunch
 
 yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
 ```
 
 - **gpick**: 可以从桌面任何地方取色，并且它还提供一些其它的高级特性
 - **SpeedCrunch**: 一个漂亮，开源，高精度的科学计算器
+
+---
+
+#### office
+
+```bash
+yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
+```
+
+##### Problems
+
+- **wps-office大部分字体粗体出现过粗无法正常显示问题**
+
+    > 问题: freetype2更新至2.13.0以上版本后出现的问题。导致wps-office 文档编辑文字大部分字体设置粗体出现过粗无法正常显示。
+    >
+    > 解决方案：[freetype2 降级至 2.13.0]( https://bbs.archlinux.org/viewtopic.php?id=288562 )
+    >
+    >  1. Download[freetype2.13.0](https://pan.baidu.com/s/15AIkxKqvTwy9Q-DS16QQIQ?pwd=ft13)
+    >
+    >  2. 降级 `sudo pacman -U freetype2-2.13.0-1-x86_64.pkg.tar.zst`
+    >
+    >  3. 修改 `/etc/pacman.conf` -> `IgnorePkg = freetype2`，排除掉这个包（不让它更新） `freetype2: ignoring package upgrade (2.13.0-1 => 2.13.2-1)`
 
 ---
 
