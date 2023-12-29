@@ -317,6 +317,19 @@ yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
 >      - *由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来
 >      - *在以后的推送或者拉取时就可以简化命令*
 
+#### 常见问题
+
+1. `fatal: unable to access 'https://github.com/xxxxxxx.git/': Failed to connect to github.com port 443: Timed out`
+
+   问题：代理出问题
+
+   解决方案：
+
+   ```bash
+   git config --global --unset http.proxy
+   git config --global --unset https.proxy
+   ```
+
 ---
 
 ### Golang
