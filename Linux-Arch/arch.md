@@ -351,6 +351,14 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
    git config --global --unset http.proxy
    git config --global --unset https.proxy
    ```
+   
+2. `fatal: unable to access 'https://github.com/xxxx.git/': gnutls_handshake() failed: The TLS connection was non-properly terminated.`
+
+   解决方案：
+
+   ```bash
+   git config --global http.sslVerify false
+   ```
 
 ---
 
