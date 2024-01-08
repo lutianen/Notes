@@ -274,11 +274,15 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
     >
     > 解决方案：[freetype2 降级至 2.13.0]( https://bbs.archlinux.org/viewtopic.php?id=288562 )
     >
-    >  1. Download[freetype2.13.0](https://pan.baidu.com/s/15AIkxKqvTwy9Q-DS16QQIQ?pwd=ft13)
-    >
+    >   1. Download[freetype2.13.0](https://pan.baidu.com/s/15AIkxKqvTwy9Q-DS16QQIQ?pwd=ft13)
     >  2. 降级 `sudo pacman -U freetype2-2.13.0-1-x86_64.pkg.tar.zst`
-    >
     >  3. 修改 `/etc/pacman.conf` -> `IgnorePkg = freetype2`，排除掉这个包（不让它更新） `freetype2: ignoring package upgrade (2.13.0-1 => 2.13.2-1)`
+    
+- `wpspdf 无法打开 PDF 文件`
+
+    > wpspdf 依赖于 libtiff5.so.5 以支撑其 PDF 功能。而系统更新后，Arch Linux 提供的是 libtiff.so.6 或更新版本，导致其无法正常工作。
+    >
+    > 解决方案：安装 [libtiff5](https://aur.archlinux.org/packages/libtiff5/)
 
 ---
 
@@ -651,4 +655,4 @@ sudo systemctl start fstrim.timer
 
 2. `tput: unknown terminal "xterm-256color"`
 
-   解决方案：`setenv TERMINFO /usr/lib/terminfo`
+   解决方案：`setenv TERMINFO /usr/lib/terminfo`wps
