@@ -656,3 +656,17 @@ sudo systemctl start fstrim.timer
 2. `tput: unknown terminal "xterm-256color"`
 
    解决方案：`setenv TERMINFO /usr/lib/terminfo`wps
+   
+3. **更新内核后，双屏显示时，某一个屏幕黑屏，但鼠标能够移动过去并显示，另一屏幕正常**
+
+   解决方案：`xrandr --output HDMI-1-0 --right-of eDP1 --auto`
+
+   - 命令解释：配置 `HDMI-1-0` 输出，使其位于 `eDP1` 输出的右侧，并自动选择最佳的分辨率和刷新率设置
+   
+   > ```bash
+   > $ xrandr --listmonitors
+   > Monitors: 2
+   > 0: +*eDP1 2560/360x1440/200+0+0  eDP1
+   > 1: +HDMI-1-0 1920/479x1080/260+2560+0  HDMI-1-0
+   > $ xrandr --output HDMI-1-0 --right-of eDP1 --auto
+   > ```
