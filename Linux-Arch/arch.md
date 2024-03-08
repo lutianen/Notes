@@ -250,13 +250,16 @@ SDL_IM_MODULE=fcitx
 ```bash
 yay -S clash-for-windows-bin 
 
-yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular spectacle gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk gpick speedcrunch
+yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular snipaste gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk gpick speedcrunch drawio-desktop crow-translate
 
 yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
 ```
 
 - **gpick**: 可以从桌面任何地方取色，并且它还提供一些其它的高级特性
 - **SpeedCrunch**: 一个漂亮，开源，高精度的科学计算器
+- **Snipaste**: 截图工具，如不可用可选用`spectacle`
+- **drawio-desktop**: [Security-first diagramming for teams](https://github.com/jgraph/drawio-desktop)
+- **crow-translate**：[翻译工具](https://github.com/crow-translate/crow-translate)
 
 ---
 
@@ -277,6 +280,10 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
     >   1. Download[freetype2.13.0](https://pan.baidu.com/s/15AIkxKqvTwy9Q-DS16QQIQ?pwd=ft13)
     >  2. 降级 `sudo pacman -U freetype2-2.13.0-1-x86_64.pkg.tar.zst`
     >  3. 修改 `/etc/pacman.conf` -> `IgnorePkg = freetype2`，排除掉这个包（不让它更新） `freetype2: ignoring package upgrade (2.13.0-1 => 2.13.2-1)`
+    >
+    > env LD_LIBRARY_PATH=/usr/local/freetype2-2.13.0-1-x86_64/usr/lib
+    >
+    > `update-desktop-database ~/.local/share/applications/`
     
 - `wpspdf 无法打开 PDF 文件`
 
@@ -316,7 +323,7 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
 
 ---
 
-#### git 常用命令
+#### Git 常用命令
 
 - `git status`
 - `git clone`
@@ -585,7 +592,7 @@ Endpoint = xxx.xxx.xxx.xxx
 
 ```bash
 # Error: /usr/bin/wg-quick: line 32: resolvconf: command not found
-sudo pacman -S openresolv 
+sudo pacman -S openresolv
 ```
 
 1. WARP 密钥获取：Telegram 中 **Warp+ Bot** 获取
@@ -594,13 +601,162 @@ sudo pacman -S openresolv
 
 2.配置文件生成：<https://replit.com/@misaka-blog/wgcf-profile-generator?v=1>
 
+https://replit.com/@tianenxd/wgcf-profile-generator，需要登陆
+
 ![image-20230722173030527](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221730585.png)
 
 3.优选IP **==warp-yxip==**
 
+```bash
+wget -N https://gitlab.com/Misaka-blog/warp-script/-/raw/main/files/warp-yxip/warp-yxip.sh && bash warp-yxip.sh
+```
+
 ![image-20230722173556110](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221735152.png)
 
 ---
+
+### Clash Verge 解决DNS泄露问题
+
+DNS 泄露其实并没有一个明确的定义，也不存在一个官方解释。
+
+大概就是说你访问YouTube等黑名单网站的时候，使用中国大陆的DNS服务器进行了解析，这可能导致隐私问题的。
+
+如果在 [DNS Leak Test](https://browserleaks.com/dns) 、[ipleak](https://ipleak.net/)这种网站的列表中看到了中国国旗，就要意识到可能发生了DNS泄露。
+虽然没有人知道具体的探测机制是什么，但很可能是从网络层面获取的。在一般的家庭网络拓扑中，wireshark可以看到什么内容，运营商就能看见什么内容，所以你使用114.114.114.114、223.5.5.5这样的DNS解析去访问了什么网站是很清晰的。
+
+**Clash开启TUN模式，关闭系统代理去使用**：与普通的系统代理模式区别在于，TUN模式下Clash会创建一张虚拟网卡，从网络层面接管所有的网络流量。
+
+#### Step 1: 开启TUN模式
+
+#### Step 2: 使用稳定的DNS
+
+DNS这部分有人会教使用运营商的DNS，**运营商的DNS只适合小白用户，因为他可能连反诈**，所以建议使用国内大厂的。
+
+1. 关闭浏览器的QUIC, 中国大陆的isp是限速udp的, 所以导致QUIC这个优秀的协议, 到了中国大陆的网络下成了个负面增益效果。
+
+    `about://flags/#enable-quic` 设置为`Disabled` (点下方弹出的重启浏览器生效)
+
+    <img src="../../../.config/Typora/typora-user-images/image-20240309001559678.png" alt="image-20240309001559678" style="zoom:50%;" />
+
+2. 关闭浏览器中的“安全DNS”
+
+    `chrome://settings/security`
+    
+    <img src="https://raw.githubusercontent.com/lutianen/PicBed/master/image-20240309001749185.png" alt="image-20240309001749185" style="zoom:50%;" />
+
+3. 在Clash Verge的【Profiles】中，点右上角的"NEW" -> Type选择"Script" -> Name随意填写(例如，"修改DNS")
+
+4. 右击新建的文件，然后"Edit File"，输入以下内容后启用：
+
+    ```JavaScript
+    function main(content) {
+    const isObject = (value) => {
+        return value !== null && typeof value === 'object'
+    }
+
+    const mergeConfig = (existingConfig, newConfig) => {
+        if (!isObject(existingConfig)) {
+        existingConfig = {}
+        }
+        if (!isObject(newConfig)) {
+        return existingConfig
+        }
+        return { ...existingConfig, ...newConfig }
+    }
+
+    const cnDnsList = [
+        'tls://223.5.5.5',
+        'tls://1.12.12.12',
+    ]
+    const trustDnsList = [
+        'https://doh.apad.pro/dns-query',
+        'https://dns.cooluc.com/dns-query',
+        'https://1.0.0.1/dns-query',
+    ]
+    const notionDns = 'tls://dns.jerryw.cn'
+    const notionUrls = [
+        'http-inputs-notion.splunkcloud.com',
+        '+.notion-static.com',
+        '+.notion.com',
+        '+.notion.new',
+        '+.notion.site',
+        '+.notion.so',
+    ]
+    const combinedUrls = notionUrls.join(',');
+    const dnsOptions = {
+        'enable': true,
+        'default-nameserver': cnDnsList, // 用于解析DNS服务器 的域名, 必须为IP, 可为加密DNS
+        'nameserver-policy': {
+        [combinedUrls]: notionDns,
+        'geosite:geolocation-!cn': trustDnsList,
+        },
+        'nameserver': trustDnsList, // 默认的域名解析服务器, 如不配置fallback/proxy-server-nameserver, 则所有域名都由nameserver解析
+    }
+
+    // GitHub加速前缀
+    const githubPrefix = 'https://ghproxy.lainbo.com/'
+
+    // GEO数据GitHub资源原始下载地址
+    const rawGeoxURLs = {
+        geoip: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat',
+        geosite: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat',
+        mmdb: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb',
+    }
+
+    // 生成带有加速前缀的GEO数据资源对象
+    const accelURLs = Object.fromEntries(
+        Object.entries(rawGeoxURLs).map(([key, githubUrl]) => [key, `${githubPrefix}${githubUrl}`]),
+    )
+
+    const otherOptions = {
+        'unified-delay': true,
+        'tcp-concurrent': true,
+        'profile': {
+        'store-selected': true,
+        'store-fake-ip': true,
+        },
+        'sniffer': {
+        enable: true,
+        sniff: {
+            TLS: {
+            ports: [443, 8443],
+            },
+            HTTP: {
+            'ports': [80, '8080-8880'],
+            'override-destination': true,
+            },
+        },
+        },
+        'geodata-mode': true,
+        'geox-url': accelURLs,
+    }
+    content.dns = mergeConfig(content.dns, dnsOptions)
+    return { ...content, ...otherOptions }
+    }
+    ```
+
+5. 设置完成后，验证DNS解析结果是否都是来自国外的Cloudflare和Google的DNS, 这时节点服务器不管拿到了你传过去的真ip还是假ip地址, 他都会再去请求一次Cloudflare/Google的DNS服务, 确保解析的正确性。
+  重要的是**没有中国大陆的DNS服务器**了，如果还是有，那你应该往当前设备的更上层寻找问题所在，比如路由器的设置等。
+
+#### Clash Verge 解决 GEOIP，CN问题
+
+目前市面上绝大多数的代理工具都依赖于 GeoIP2 数据库判断地址所属地。它们的规则结尾部分一般都会有一条类似 `GEOIP, CN`，用来查询目的 IP 地址是否属于中国大陆，从而判断是否直连。
+
+这些代理工具通常使用的 GeoIP2 数据库是来自于 MaxMind 的 [GeoLite2](https://dev.maxmind.com/geoip/geoip2/geolite2/) 免费数据库。这个数据库目前存在一下几个问题：
+
+- 获取不便：从 2019 年 12 月 30 日起，必须注册后才能下载
+
+- 数据量大：数据库庞大，包含全球的 IP 地址段，约 10 MB
+
+- 准确度低：对中国大陆的 IP 地址判定不准，如：香港阿里云的 IP 被判定为新加坡、中国大陆等。
+
+庞大的数据量对于大多数中国大陆的用户来说是没有意义的，因为只仅需要去判断 IP 的地理位置是否属于中国大陆境内，其他国家的 IP 一律代理/直连。过多的数据量会增加载入时间，降低查询效率。
+
+我们在之前创建的Script中已经包含了下载更精简合适中国大陆的IP数据库链接, 现在只需要手动操作下载和替换即可:
+
+1. **Update GeoData**: Clash Verge Rev的`设置`菜单中点击`Update GeoData`
+2. **验证下载**: 打开Clash Verge托盘中的`APP Dir`，找到`geoip.dat`文件，验证其大小是否为**几百KB**
+3. **重启Clash Verge**：确保数据库被正确应用
 
 ## System optimization
 
