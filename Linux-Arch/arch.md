@@ -278,18 +278,40 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
     > 解决方案：[freetype2 降级至 2.13.0]( https://bbs.archlinux.org/viewtopic.php?id=288562 )
     >
     >   1. Download[freetype2.13.0](https://pan.baidu.com/s/15AIkxKqvTwy9Q-DS16QQIQ?pwd=ft13)
-    >  2. 降级 `sudo pacman -U freetype2-2.13.0-1-x86_64.pkg.tar.zst`
-    >  3. 修改 `/etc/pacman.conf` -> `IgnorePkg = freetype2`，排除掉这个包（不让它更新） `freetype2: ignoring package upgrade (2.13.0-1 => 2.13.2-1)`
+    >   2. 降级 `sudo pacman -U freetype2-2.13.0-1-x86_64.pkg.tar.zst`
+    >   3. 修改 `/etc/pacman.conf` -> `IgnorePkg = freetype2`，排除掉这个包（不让它更新） `freetype2: ignoring package upgrade (2.13.0-1 => 2.13.2-1)`
     >
     > env LD_LIBRARY_PATH=/usr/local/freetype2-2.13.0-1-x86_64/usr/lib
     >
-    > `update-desktop-database ~/.local/share/applications/`
-    
+    > `update-desktop-database ~/.local/share/applications
+
 - `wpspdf 无法打开 PDF 文件`
 
     > wpspdf 依赖于 libtiff5.so.5 以支撑其 PDF 功能。而系统更新后，Arch Linux 提供的是 libtiff.so.6 或更新版本，导致其无法正常工作。
     >
     > 解决方案：安装 [libtiff5](https://aur.archlinux.org/packages/libtiff5/)
+
+- `WPS 无法输入中文`
+
+    > [解决方案](https://wiki.archlinuxcn.org/wiki/WPS_Office#Fcitx5_%E6%97%A0%E6%B3%95%E8%BE%93%E5%85%A5%E4%B8%AD%E6%96%87)
+    >
+    > `wpp`
+    >
+    > `wpspdf`
+    >
+    > `wpp`
+    >
+    > `et`
+
+- `lx-music 数据同步失败`
+
+    > 1. **确保PC端的同步服务已启用成功**: 若连接码、同步服务地址没有内容，则证明服务启动失败，此时看启用同步功能复选框后面的错误信息自行解决
+    > 2. 在手机浏览器地址栏输入<http://x.x.x.x:5963/hello后回车，若此地址可以打开并显示> Hello~::^-^::~v4~，则证明移动端与PC端网络已互通，
+    > 3. 若移动端无法打开第2步的地址，则在PC端的浏览器地址栏输入并打开该地址，若可以打开，则可能性如下：
+    >    - LX Music PC端被**电脑防火墙**拦截
+    >    - **PC端与移动端不在同一个网络下**，
+    >    - 路由器开启了AP隔离（一般在公共网络下会出现这种情况）
+    > 4. 要验证双方是否在同一个网络或是否开启AP隔离，可以在电脑打开cmd使用ping命令ping移动端显示的ip地址，若可以通则说明网络正常
 
 ---
 
@@ -362,7 +384,7 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
    git config --global --unset http.proxy
    git config --global --unset https.proxy
    ```
-   
+
 2. `fatal: unable to access 'https://github.com/xxxx.git/': gnutls_handshake() failed: The TLS connection was non-properly terminated.`
 
    解决方案：
@@ -601,7 +623,7 @@ sudo pacman -S openresolv
 
 2.配置文件生成：<https://replit.com/@misaka-blog/wgcf-profile-generator?v=1>
 
-https://replit.com/@tianenxd/wgcf-profile-generator，需要登陆
+<https://replit.com/@tianenxd/wgcf-profile-generator，需要登陆>
 
 ![image-20230722173030527](https://raw.githubusercontent.com/lutianen/PicBed/master/202307221730585.png)
 
@@ -641,7 +663,7 @@ DNS这部分有人会教使用运营商的DNS，**运营商的DNS只适合小白
 2. 关闭浏览器中的“安全DNS”
 
     `chrome://settings/security`
-    
+
     <img src="https://raw.githubusercontent.com/lutianen/PicBed/master/image-20240309001749185.png" alt="image-20240309001749185" style="zoom:50%;" />
 
 3. 在Clash Verge的【Profiles】中，点右上角的"NEW" -> Type选择"Script" -> Name随意填写(例如，"修改DNS")
@@ -736,7 +758,7 @@ DNS这部分有人会教使用运营商的DNS，**运营商的DNS只适合小白
     ```
 
 5. 设置完成后，验证DNS解析结果是否都是来自国外的Cloudflare和Google的DNS, 这时节点服务器不管拿到了你传过去的真ip还是假ip地址, 他都会再去请求一次Cloudflare/Google的DNS服务, 确保解析的正确性。
-  重要的是**没有中国大陆的DNS服务器**了，如果还是有，那你应该往当前设备的更上层寻找问题所在，比如路由器的设置等。
+    重要的是**没有中国大陆的DNS服务器**了，如果还是有，那你应该往当前设备的更上层寻找问题所在，比如路由器的设置等。
 
 #### Clash Verge 解决 GEOIP，CN问题
 
@@ -812,13 +834,13 @@ sudo systemctl start fstrim.timer
 2. `tput: unknown terminal "xterm-256color"`
 
    解决方案：`setenv TERMINFO /usr/lib/terminfo`wps
-   
+
 3. **更新内核后，双屏显示时，某一个屏幕黑屏，但鼠标能够移动过去并显示，另一屏幕正常**
 
    解决方案：`xrandr --output HDMI-1-0 --right-of eDP1 --auto`
 
    - 命令解释：配置 `HDMI-1-0` 输出，使其位于 `eDP1` 输出的右侧，并自动选择最佳的分辨率和刷新率设置
-   
+
    > ```bash
    > $ xrandr --listmonitors
    > Monitors: 2
