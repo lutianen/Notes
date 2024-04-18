@@ -4,9 +4,9 @@
 
 > 下面是一些笔记的链接，点击即可跳转
 
-- [ArchLinux 相关操作](./Linux-Arch/arch.md)
+- [ArchLinux 相关操作](https://lutianen.github.io/archlinuxnote/)
 
-- [Typora 主题配置](./Markdown/Kyten.css)
+- [Typora 主题配置](https://lutianen.github.io/typora-theme/)
 
 - [Google C++ 编程规范](./C++/Google_C++_Style_Guide.md)
 
