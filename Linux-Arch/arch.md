@@ -250,7 +250,7 @@ SDL_IM_MODULE=fcitx
 ```bash
 yay -S clash-for-windows-bin 
 
-yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular snipaste gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk gpick speedcrunch drawio-desktop crow-translate
+yay -Sy neofetch google-chrome obs-studio baidunetdisk nutstore-experimental xunlei-bin telegram-desktop gitkraken visual-studio-code-bin typora-free redis net-tools pot-translation translate-shell okular snipaste gwenview kcalc wemeet-bin vlc wget ark shotcut inkscape ninja gnu-netcat tcpdump cmake clang tree python-pip caj2pdf-qt ttf-hack-nerd transmission-gtk gpick speedcrunch drawio-desktop crow-translate zeal
 
 yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
 ```
@@ -260,6 +260,7 @@ yay -S electronic-wechat-uos-bin linuxqq lx-music-desktop
 - **Snipaste**: 截图工具，如不可用可选用`spectacle`
 - **drawio-desktop**: [Security-first diagramming for teams](https://github.com/jgraph/drawio-desktop)
 - **crow-translate**：[翻译工具](https://github.com/crow-translate/crow-translate)
+- **zeal**：离线文档浏览器
 
 ---
 
@@ -312,6 +313,16 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
     >    - **PC端与移动端不在同一个网络下**，
     >    - 路由器开启了AP隔离（一般在公共网络下会出现这种情况）
     > 4. 要验证双方是否在同一个网络或是否开启AP隔离，可以在电脑打开cmd使用ping命令ping移动端显示的ip地址，若可以通则说明网络正常
+
+---
+
+### 远程工具 - [Remmina](https://remmina.org/)
+
+- `$ yay -S remmina freerdp`
+
+- [使用教程](https://www.bilibili.com/video/BV1x64y1X7FT)
+
+    安装 `freerdp` 插件后，可以走 RDP 协议远程 Win10（**Win10 不需要其他任何设置**）
 
 ---
 
@@ -392,6 +403,17 @@ yay -S wps-office wps-office-mui-zh-cn ttf-wps-fonts
    ```bash
    git config --global http.sslVerify false
    ```
+   
+3. ``
+
+   解决方案：
+
+   ```bash
+   [http]
+   	postBuffer = 5242880000
+   ```
+
+   
 
 ---
 
@@ -658,7 +680,7 @@ DNS这部分有人会教使用运营商的DNS，**运营商的DNS只适合小白
 
     `about://flags/#enable-quic` 设置为`Disabled` (点下方弹出的重启浏览器生效)
 
-    <img src="../../../.config/Typora/typora-user-images/image-20240309001559678.png" alt="image-20240309001559678" style="zoom:50%;" />
+    <img src="https://raw.githubusercontent.com/lutianen/PicBed/master/image-20240309001559678.png" alt="image-20240309001559678" style="zoom:50%;" />
 
 2. 关闭浏览器中的“安全DNS”
 

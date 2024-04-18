@@ -311,6 +311,26 @@ Golang 的 Channel 底层是**环形队列（长度在创建时指定）**实现
 
 没有办法直接测试一个 Channel 是否被关闭，但接收操作有一个变体形式 `x, ok := <-channel`：它多接收一个结果，多接收的第二个结果是一个布尔值，表示 Channel 是否被关闭；(**不管一个 Channel 是否被关闭，当它没有被引用时，Go 语言垃圾回收器将自动回收**)
 
+**Go 语言的 `range` 循环可直接在 channels 上面迭代，它依次从 channel 接收数据，当 channel 被关闭且没有值可接收时跳出循环**
+
+```go
+go func() {
+  for {
+    x, ok := <- ch
+    if !ok {
+      break
+    }
+    // ...
+  }
+}()
+// 等价于以下语法
+go func() {
+  for x := range ch {
+    // ...
+  }
+}()
+```
+
 基本操作：
 
 > chan 是引用类型，需要使用 `make` 进行创建
@@ -371,6 +391,7 @@ Go 语言中的 Channel 可以设置为单方向的(**在编译期检测**)，�
 **生产者-消费者模式中，当生产者的生产速度一直快于消费者的消费速度，那么它们之间的缓存大部分时间都将会满的；反之，它们大部分时间都是空的；对于这两类场景，额外的缓存并没有带来任何好处.**
 
 > 实例：某个 Server 并发地向三个镜像站点发出请求，三个站点分散在不同的地理位置，它们分别将收到的响应发送到带缓存 channel,最后接收者只接收第一个收到的响应，即最快的响应；
+>
 > ```go
 > func mirroredQuery() string {
 >     responses := make(chan string, 3)
@@ -380,6 +401,7 @@ Go 语言中的 Channel 可以设置为单方向的(**在编译期检测**)，�
 >     return <-responses // return the quickest response
 > }
 > ```
+>
 > **如果使用了无缓存的 channel,那么两个慢的 goroutines 将会被永远阻塞，因为没有其他的 goroutine 接收数据，这种情况称为 goroutine 泄漏，这将是一个 BUG (和垃圾变量不同，泄漏的 goroutine 将不会被回收)**
 
 ### 并发的循环
@@ -497,23 +519,23 @@ Go 语言通过 `GO111MODULE` 环境变量来控制 Go modules 的开启和关�
 
 ```go
 func TestIsPalindrome(t *testing.T) {
-	// 测试驱动表格
-	var tests = []struct {
-		input string
-		want  bool
-	}{
-		{"", true},
-		{"aba", true},
-		{"été", true},
-		{"Et se resservir, ivresse reste.", true},
-		{"palindrome", false}, // non-palindrome
+    // 测试驱动表格
+    var tests = []struct {
+        input string
+        want  bool
+    }{
+        {"", true},
+        {"aba", true},
+        {"été", true},
+        {"Et se resservir, ivresse reste.", true},
+        {"palindrome", false}, // non-palindrome
         // ...
-	}
-	for _, test := range tests {
-		if rc := IsPalindrome(test.input); rc != test.want {
-			t.Errorf("IsPalindrome(%q) = %v", test.input, rc)
-		}
-	}
+    }
+    for _, test := range tests {
+        if rc := IsPalindrome(test.input); rc != test.want {
+            t.Errorf("IsPalindrome(%q) = %v", test.input, rc)
+        }
+    }
 }
 ```
 
@@ -526,7 +548,7 @@ func TestIsPalindrome(t *testing.T) {
 - **`-benchmem` 命令行标志参数将在报告中包含内存分配 (*快的程序往往是伴随着较少的内存分配*) 的统计数据**
 
 - 比较行的基准测试函数就是普通程序代码，通常是单参数的函数，由几个不同数量级的基准测试函数调用；**要避免直接修改 `b.N` 来控制输入的大小，除非将它作为一个固定大小的迭代计算输入，否则会导致基准测试的结果不准确**
-    
+  
     ```go
     func benchmark(b *testing.B, size int) { /*...*/ }
     func Benchmark10(b *testing.B) { benchmark(b, 10) }
@@ -557,7 +579,7 @@ ok      github.com/lutianen/gopl/src/testing/word       1.312s
 
 #### 剖析
 
-当我们想仔细观察程序的性能时，最好的方法是性能剖析(profiling). 
+当我们想仔细观察程序的性能时，最好的方法是性能剖析(profiling).
 
 **剖析而技术是基于程序运行期间一些自动抽样，然后再收尾时进行推断，最后产生的统计结果就是剖析报告**；
 
@@ -570,6 +592,7 @@ ok      github.com/lutianen/gopl/src/testing/word       1.312s
 > **剖析数据的收集会带来额外的开销，因此默认情况下是关闭的，需要通过命令行标志参数 `-cpuprofile`、`-memprofile` 和 `-blockprofile` 来开启**
 >
 > NOTE: **当使用多个标志参数时需要当心，因为一项分析操作可能会影响其他项的分析结果**
+>
 > ```bash
 > go test -cpuprofile=cpu.out
 > go test -blockprofile=block.out
@@ -991,8 +1014,8 @@ So("asdf", ShouldNotBeBlank)
 
 48. **Go 语言中，定义一个只有某个方法的新接口并使用类型断言来检测某个动态类型是否满足该接口**；除了空接口 `interface{}` 外，接口类型很少意外巧合地被实现；
 
-49. 接口的使用方式：
-    
+49. 接口的使用方式
+
     - 以 `io.Reader`, `io.Writer`, `fmt.Stringer`, `sort.Interface`, `http.Handler` 和 `error` 为典型，一个接口的方法表达了实现这个接口的具体类型间的相似性，但是隐藏了代码的细节和这些具体类型的操作：**重点在于方法上，而不是具体的类型上**.
 
     - *Discriminated unions 可辨识联合*: 利用一个接口值可以持有各种具体类型的能力，将这个接口认为是这些类型的联合；类型断言用来动态地区别这些类型，使得对每一种情况都不一样：**重点在于具体的类型满足这个接口，而不在于接口的方法，且没有任何的信息隐藏**.
@@ -1008,6 +1031,7 @@ So("asdf", ShouldNotBeBlank)
         // ...
     }
     ```
+
     **用这种方式构造查询语句，可以避免 SQL 注入攻击（对手利用输入内容中不正确的引导来控制查询语句）**；
 
 51. `switch` 语句可以简化 `if-else` 链(一连串值做相等测试)，且 `switch` 语句中的 `case` 语句不需要显式地使用 `break` 语句来终止，`fallthrough` 语句可以用来强制执行下一个 `case` 语句；
@@ -1041,3 +1065,140 @@ for input.Scan() { // 每次调用 input.Scan() 读取下一行，并移除行�
 一个模板是一个字符串或一个文件，里面包含了一个或多个有双花括号包含的 `{{action}}` 对象，大部分的字符串只是按字面值打印，但是对于 `{{` 和 `}}` 之间的文本，将触发其他行为。
 
 每个 `{{action}}` 都包含了一个用模板语言书写的表达式，一个 `{{action}}` 虽然简短但是可以输出复杂的打印值，模板语言包含通过选择结构体的成员、调用函数或方法、表达式控制流 if-else 语句和 range 循环语句，还有其他实例化模板等诸多特性.
+
+## Golang 编译输出可执行文件
+
+```go	
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello KiteLu")
+}
+```
+
+编译命令：`go build -x xxx.go`
+
+​	编译：将**文本文件**编译成**目标文件(`., .a`)**
+
+​	链接：将**目标文件**合并为**可执行文件**
+
+```bash
+go build -x test.go
+
+➜  test go build -x ./test.go                                                                                                                 
+WORK=/tmp/go-build1973027835
+mkdir -p $WORK/b001/
+cat >/tmp/go-build1973027835/b001/importcfg << 'EOF' # internal
+# import config
+packagefile fmt=/home/tianen/.cache/go-build/7d/7d9cea467775f38ca753cf33fed8d5056e8910dfc15d287e1902ff0ba3437318-d
+packagefile runtime=/home/tianen/.cache/go-build/56/568dfe35376c10df226a7f0c65b54292de39cadf9e7787dd22bc0b11fd66051c-d
+EOF
+cd /tmp/goTmp/test
+/usr/lib/go/pkg/tool/linux_amd64/compile -o $WORK/b001/_pkg_.a -trimpath "$WORK/b001=>" -p main -complete -buildid -lghz6BJwbJXKjRgWrNa/-lghz6BJwbJXKjRgW
+rNa -goversion go1.21.6 -c=4 -nolocalimports -importcfg $WORK/b001/importcfg -pack ./test.go
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/_pkg_.a # internal
+cp $WORK/b001/_pkg_.a /home/tianen/.cache/go-build/c7/c7a7b9de13c7a63aba84077dd0aaca0591cc143dc488d3b50f67b47332d76f78-d # internal
+cat >/tmp/go-build1973027835/b001/importcfg.link << 'EOF' # internal
+packagefile command-line-arguments=/tmp/go-build1973027835/b001/_pkg_.a
+packagefile fmt=/home/tianen/.cache/go-build/7d/7d9cea467775f38ca753cf33fed8d5056e8910dfc15d287e1902ff0ba3437318-d
+packagefile runtime=/home/tianen/.cache/go-build/56/568dfe35376c10df226a7f0c65b54292de39cadf9e7787dd22bc0b11fd66051c-d
+packagefile errors=/home/tianen/.cache/go-build/1c/1c80cd5f9dad0100705dd3a7850f9d6948ac94cf509b1053f1db72ae6fac3df8-d
+packagefile internal/fmtsort=/home/tianen/.cache/go-build/fa/fab9c34d6bbcf1dffca9bab04e69ed9e36bbb88cf7e1d3860feb09ce56d72cac-d
+packagefile io=/home/tianen/.cache/go-build/d1/d1f0dc39c3aad98d78da5422bbe7315c8cd0568d58d360bf5d339a2cb4649178-d
+packagefile math=/home/tianen/.cache/go-build/fd/fdec66450bc3cd66cd67774376263c0e72ed49203e73359b670690a661762c10-d
+packagefile os=/home/tianen/.cache/go-build/f9/f921a5c6f28ccb7ea182c96e894f1c79ce0e6af305f97233859cedae420013db-d
+packagefile reflect=/home/tianen/.cache/go-build/46/4661fe18b9639f8d184ddcc665bc398e2ced493cad1aef6ab20492d7d312ec8f-d
+packagefile sort=/home/tianen/.cache/go-build/68/68a866806288bac1d9acef1c1696775788be1ac3300a81e7cc78e789b1a36c74-d
+packagefile strconv=/home/tianen/.cache/go-build/62/622fb312ae6cfbbb3b57bd45016ebd7d671288a677f892acd80b1da91a7443d9-d
+packagefile sync=/home/tianen/.cache/go-build/3f/3f78c11d1f20633abd0ca074ada932e1b918f476a2bd7e503db02facb3b7f6d5-d
+packagefile unicode/utf8=/home/tianen/.cache/go-build/43/433174e5af5b80e2ded61c3f202f36e8fc2fd67136283d02ae7655311cd2e826-d
+packagefile internal/abi=/home/tianen/.cache/go-build/8f/8f73360f95d49f5792662d77a11c6390c0ea93fae3bac723bf99cb05a569f06a-d
+packagefile internal/bytealg=/home/tianen/.cache/go-build/b4/b4cf1178c8d2352eeaa2e3dc2eaafcc7c85eb7e35c3695ba8af8fe13a3a537be-d
+packagefile internal/coverage/rtcov=/home/tianen/.cache/go-build/22/22c8b71590d5466b4c314b91a2777bbe7ab33ded98de93b7e601e35e691fdbbb-d
+packagefile internal/cpu=/home/tianen/.cache/go-build/03/0353308005428002637083150855014a4db7b833a7f7d1185550db46048d36ee-d
+packagefile internal/goarch=/home/tianen/.cache/go-build/51/518116f37b6d04cc2d24425d4c82cdde9193676ba18a2def02fefb43590119d5-d
+packagefile internal/godebugs=/home/tianen/.cache/go-build/e8/e81fb4fa0c65ace60f59c474ba27a4cf5009f2ef37b6a4c9f9053a841e845e48-d
+packagefile internal/goexperiment=/home/tianen/.cache/go-build/9c/9ccec936d2cea8368e54555d0d200a95110b7ca5aac0b4f210d28d91e1832284-d
+packagefile internal/goos=/home/tianen/.cache/go-build/7d/7d355e25ae8ceb6f8be4c94b03bca049304ab096e295f3a509878930595d8db9-d
+packagefile runtime/internal/atomic=/home/tianen/.cache/go-build/a7/a7bccb8f7ce1cd1ce97a272a3fa7b1b4c650f02f5eac0e6730ca0c00a8186a33-d
+packagefile runtime/internal/math=/home/tianen/.cache/go-build/a3/a3a0620a1e480277d2264c456b5ea2603c418122e41bfb0c4429b921c8169133-d
+packagefile runtime/internal/sys=/home/tianen/.cache/go-build/e0/e0338749ddd125ceddc908abe8634dce097302c45320ed8314cff34bd3186af7-d
+packagefile runtime/internal/syscall=/home/tianen/.cache/go-build/e5/e5ef38534d4527b5d3e83c6d02fe2b229d65ccd01ad71c50dc6fec8f7157587f-d
+packagefile internal/reflectlite=/home/tianen/.cache/go-build/c0/c0b8e3796305fb2527013e0b14a3d8c3b481beec682386e62f0ada60d8a4ad77-d
+packagefile math/bits=/home/tianen/.cache/go-build/6f/6faf41a5a32b7e40b06cd09d3644e0a5cf825c5270d3d26c305950784e988fc1-d
+packagefile internal/itoa=/home/tianen/.cache/go-build/6c/6cdd0c6eaa3886adf3fa04f64603aa83a6bebc9c5bb2f2fc5625b4b5c779e50b-d
+packagefile internal/poll=/home/tianen/.cache/go-build/32/326a1a0677a3b3f938ec62a39d15267a66d1a5f0a808b154321f266fed1cc22e-d
+packagefile internal/safefilepath=/home/tianen/.cache/go-build/c3/c305a46ec453243dc6cbaab8558430a98dccfeea6bdc3ca295b5a5cbb1005bd9-d
+packagefile internal/syscall/execenv=/home/tianen/.cache/go-build/ad/ad1c62277b8d6855801877b019ae25e3601bd452b06830d4e1fa3b8754f8641e-d
+packagefile internal/syscall/unix=/home/tianen/.cache/go-build/ad/ad65f0bee88ef17370a4d93b547afae884d7e4b45d7b2fddd0cc34f0598ed12e-d
+packagefile internal/testlog=/home/tianen/.cache/go-build/c0/c0fb08122a65345a4296f7c170514c01cc1e523fde7098d4176a0088b53adc3a-d
+packagefile io/fs=/home/tianen/.cache/go-build/22/22f993a780e30a4889bf634378e4f93b34f32a54137845325705c1bfd1c23200-d
+packagefile sync/atomic=/home/tianen/.cache/go-build/04/043a49ad95191c89c7e580e0c01821b57b7ba72c8f4c6573487d69849c8a9dda-d
+packagefile syscall=/home/tianen/.cache/go-build/6f/6f9a3867d7a435e87d0300e515bc554af62ad155817ce279899ddf86ac6a050e-d
+packagefile time=/home/tianen/.cache/go-build/02/02507363502e7d6ba588c218623ac88328e3fac3a46001b3bf0554bc3f9b1947-d
+packagefile internal/unsafeheader=/home/tianen/.cache/go-build/b8/b850f766ab98d0a6ffebeececf0553648ed533f96446fb9b5583613a5923a7ef-d
+packagefile unicode=/home/tianen/.cache/go-build/18/181b89b73d7dff108c462b12c55d5af3f38ac56bf73a3d7e008f149fd9f8492a-d
+packagefile internal/race=/home/tianen/.cache/go-build/db/dbebfc4fc2a27f08d42027f1dc3e006ba8fd96e33961bf2e88ab3acc6ec11c82-d
+packagefile internal/oserror=/home/tianen/.cache/go-build/7b/7be7f501cec7404af52036b9cec40a7cbb75882c2fbdc43cbcae8e57e1d720e1-d
+packagefile path=/home/tianen/.cache/go-build/ad/ad0630a053d02d3b6cb30cae6462920bb89dd562501ae8b906c15f20c1b478de-d
+modinfo "0w\xaf\f\x92t\b\x02A\xe1\xc1\a\xe6\xd6\x18\xe6path\tcommand-line-arguments\nbuild\t-buildmode=exe\nbuild\t-compiler=gc\nbuild\tCGO_ENABLED=1\nbu
+ild\tCGO_CFLAGS=\nbuild\tCGO_CPPFLAGS=\nbuild\tCGO_CXXFLAGS=\nbuild\tCGO_LDFLAGS=\nbuild\tGOARCH=amd64\nbuild\tGOOS=linux\nbuild\tGOAMD64=v1\n\xf92C1\x86
+\x18 r\x00\x82B\x10A\x16\xd8\xf2"
+EOF
+mkdir -p $WORK/b001/exe/
+cd .
+/usr/lib/go/pkg/tool/linux_amd64/link -o $WORK/b001/exe/a.out -importcfg $WORK/b001/importcfg.link -buildmode=exe -buildid=kADphbtisEk6HeZBwQCw/-lghz6BJw
+bJXKjRgWrNa/CKe8nNhceRf9tUu_VUS2/kADphbtisEk6HeZBwQCw -extld=gcc $WORK/b001/_pkg_.a
+/usr/lib/go/pkg/tool/linux_amd64/buildid -w $WORK/b001/exe/a.out # internal
+mv $WORK/b001/exe/a.out test
+rm -r $WORK/b001/
+```
+
+查看可执行文件类型：`file ./test.go`
+
+```bash
+➜  test file ./test
+./test: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, Go BuildID=kADphbtisEk6HeZBwQCw/-lghz6BJwbJXKjRgWrNa/CKe8nNhceRf9tUu_VUS2/fr8M8xjUO_oYsz4Kvb_k, with 
+debug_info, not stripped
+```
+
+查看ELF文件的Header -> 程序执行入口`Entry point address` ：
+
+```bash
+➜  test readelf -h ./test
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              EXEC (Executable file)
+  Machine:                           Advanced Micro Devices X86-64
+  Version:                           0x1
+  Entry point address:               0x45ddc0
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          400 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         6
+  Size of section headers:           64 (bytes)
+  Number of section headers:         23
+  Section header string table index: 3
+```
+
+Go的可执行文件与OS Kernel的联系：
+
+<img src="https://raw.githubusercontent.com/lutianen/PicBed/master/Golang-Executable.svg" alt="Golang-Executable" style="zoom:150%;" />
+
+Go 的Runtime
+
+- Scheduler：调度器管理所有的G, M, P, 在后台实行调度循环；最核心，负责串联所有的 runtime 流程
+- Netpoll：网络轮询负责管理网络FD相关的读写、就绪事件
+- Memory：当代码需要内存时，负责内存分配工作
+- Garbage：当内存不再需要时，负责回收内存
+
+## Go Standard Library

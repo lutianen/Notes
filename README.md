@@ -6,7 +6,7 @@
 
 - [ArchLinux 相关操作](./Linux-Arch/arch.md)
 
-- [Typora 主题配置](./Markdown/lute.css)
+- [Typora 主题配置](./Markdown/Kyten.css)
 
 - [Google C++ 编程规范](./C++/Google_C++_Style_Guide.md)
 
