@@ -870,3 +870,9 @@ sudo systemctl start fstrim.timer
    > 1: +HDMI-1-0 1920/479x1080/260+2560+0  HDMI-1-0
    > $ xrandr --output HDMI-1-0 --right-of eDP1 --auto
    > ```
+
+4. zip 压缩包解压乱码
+
+    产生这种情况的原因是，zip 格式本身的缺陷导致的：**zip 格式没有指定文件名的编码格式，因此在压缩和解压时都会采用OS本地编码，而 Window 下简体中文采用的是 `GBK`/`GB312` 编码，Linux 则采用的是 `UTF-8` 编码，两者不一致导致了乱码的产生。
+
+    解决方案: `unzip -O GBK xxx.zip`
